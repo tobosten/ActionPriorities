@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "ActionPriorities",
+    "slug": "ActionPriorities",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "ActionPriorities"
+}
