@@ -1,16 +1,18 @@
 import { View, Text, Image, Dimensions, FlatList, Switch, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
-
-import PersonTalking from '../components/PersonTalking'
 import NotificationListEmpty from '../components/NotificationListEmpty'
 import FAB from '../components/FAB'
 import NotificationComponent from '../components/NotificationComponent'
+import DatePicker from 'react-native-date-picker'
 
 
 const NotificationScreen = () => {
 
     const [emptyList, setEmptyList] = useState(true)
     let windowHeight = Dimensions.get("window").height
+
+    const [date, setDate] = useState(new Date())
+    const [open, setOpen] = useState(false)
 
 
 
@@ -51,6 +53,26 @@ const NotificationScreen = () => {
                             style={{ /* borderWidth: 1, */ width: "90%", marginTop: 20 }}
                         />
                     </View>
+
+                    <Button
+                        title="Date picker"
+                        onPress={() => { setOpen(!open) }}
+                    />
+
+
+                    <DatePicker
+                        modal
+                        open={open}
+                        date={date}
+                        mode="datetime"
+                        is24hourSource="locale"
+                        /* textColor='blue' */
+                        onConfirm={(date) => {
+                            setOpen(!open)
+                            setDate(date)
+                        }}
+                        onCancel={() => { setOpen(!open) }}
+                    />
 
 
 
