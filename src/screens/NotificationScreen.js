@@ -30,7 +30,6 @@ const NotificationScreen = () => {
     ]
 
     const scheduleNotification = (time) => {
-        //Notifications.scheduleNotification(date)
         Notifications.scheduleNotification({
             title: "Title",
             message: "Message",
@@ -43,7 +42,7 @@ const NotificationScreen = () => {
     return (
         <View style={{ borderWidth: 1, flex: 1, }}>
             {emptyList == true ? (
-                <View style={{ /* borderWidth: 1, *//*  alignItems: "center",  */ }}>
+                <View style={{}}>
 
                     <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>Notifications</Text>
 
@@ -62,7 +61,7 @@ const NotificationScreen = () => {
                                 )
                             }}
                             keyExtractor={(item, index) => index}
-                            style={{ /* borderWidth: 1, */ width: "90%", marginTop: 20 }}
+                            style={{ width: "90%", marginTop: 20 }}
                         />
                     </View>
 
