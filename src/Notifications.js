@@ -26,11 +26,11 @@ class Notifications {
         });
     };
 
-    scheduleNotification(date) {
-        PushNotification.localNotification({
+    scheduleNotification({date, title, message}) {
+        PushNotification.localNotificationSchedule({
             channelId: "reminders",
-            title: "reminder",
-            message: "reminder message",
+            title: title,
+            message: message,
             date,
         })
     }

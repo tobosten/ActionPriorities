@@ -29,9 +29,14 @@ const NotificationScreen = () => {
     },
     ]
 
-    const setNotification = ({ time }) => {
+    const scheduleNotification = (time) => {
         //Notifications.scheduleNotification(date)
-        Notifications.scheduleNotification(time)
+        Notifications.scheduleNotification({
+            title: "Title",
+            message: "Message",
+            date: time
+        })
+        console.log(time);
     }
 
 
@@ -61,16 +66,11 @@ const NotificationScreen = () => {
                         />
                     </View>
 
-                    {/*  <Button
-                        title="Set notification after 5 seconds"
-                        onPress={setNotification}
-                    /> */}
-
-
                     <Button
                         title="Date picker"
                         onPress={() => {
                             setOpen(!open)
+                            setDate(new Date(Date.now()))
                         }}
                     />
 
@@ -83,15 +83,10 @@ const NotificationScreen = () => {
                         //textColor='blue'
                         onConfirm={(time) => {
                             setOpen(!open)
-                            /* setDate(time) */
-                            setNotification(time)
-                            /*  setNotification(date) */
+                            scheduleNotification(time)
                         }}
                         onCancel={() => { setOpen(!open) }}
                     />
-
-
-
                 </View>
             ) : (
                 <View style={{ /* borderWidth: 1, */ flex: 1, alignItems: "center", }}>
