@@ -37,3 +37,5 @@ class Notifications {
 }
 
 export default new Notifications();
+
+

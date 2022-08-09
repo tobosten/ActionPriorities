@@ -12,7 +12,7 @@ const NotificationScreen = () => {
     const [emptyList, setEmptyList] = useState(true)
     let windowHeight = Dimensions.get("window").height
 
-    const [date, setDate] = useState(new Date())
+    const [date, setDate] = useState(new Date(Date.now()))
     const [open, setOpen] = useState(false)
 
 
@@ -29,9 +29,11 @@ const NotificationScreen = () => {
     },
     ]
 
-    const setNotification = (date) => {
-        Notifications.scheduleNotification(date)
+    const setNotification = ({ time }) => {
+        //Notifications.scheduleNotification(date)
+        Notifications.scheduleNotification(time)
     }
+
 
     return (
         <View style={{ borderWidth: 1, flex: 1, }}>
@@ -59,14 +61,18 @@ const NotificationScreen = () => {
                         />
                     </View>
 
+                    {/*  <Button
+                        title="Set notification after 5 seconds"
+                        onPress={setNotification}
+                    /> */}
+
+
                     <Button
                         title="Date picker"
-                        onPress={() => { 
+                        onPress={() => {
                             setOpen(!open)
-                            setNotification(date)
-                         }}
+                        }}
                     />
-
 
                     <DatePicker
                         modal
@@ -74,10 +80,12 @@ const NotificationScreen = () => {
                         date={date}
                         mode="datetime"
                         is24hourSource="locale"
-                        /* textColor='blue' */
-                        onConfirm={(date) => {
+                        //textColor='blue'
+                        onConfirm={(time) => {
                             setOpen(!open)
-                            setDate(date)
+                            /* setDate(time) */
+                            setNotification(time)
+                            /*  setNotification(date) */
                         }}
                         onCancel={() => { setOpen(!open) }}
                     />
