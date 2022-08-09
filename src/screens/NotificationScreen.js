@@ -4,6 +4,7 @@ import NotificationListEmpty from '../components/NotificationListEmpty'
 import FAB from '../components/FAB'
 import NotificationComponent from '../components/NotificationComponent'
 import DatePicker from 'react-native-date-picker'
+import Notifications from '../Notifications'
 
 
 const NotificationScreen = () => {
@@ -27,6 +28,10 @@ const NotificationScreen = () => {
         time: "19:00"
     },
     ]
+
+    const setNotification = (date) => {
+        Notifications.scheduleNotification(date)
+    }
 
     return (
         <View style={{ borderWidth: 1, flex: 1, }}>
@@ -56,7 +61,10 @@ const NotificationScreen = () => {
 
                     <Button
                         title="Date picker"
-                        onPress={() => { setOpen(!open) }}
+                        onPress={() => { 
+                            setOpen(!open)
+                            setNotification(date)
+                         }}
                     />
 
 
