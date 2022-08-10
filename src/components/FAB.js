@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Image, Dimensions, Animated, Easing } fro
 import React, { useRef } from 'react'
 import borderShadow from "../assets/borderShadow"
 
-const FAB = () => {
+const FAB = ({ onPress }) => {
 
     const spinValue = useRef(new Animated.Value(0)).current;
     Animated.loop(
@@ -25,14 +25,16 @@ const FAB = () => {
     const windowWidth = Dimensions.get("window").width
 
     return (
-        <TouchableOpacity style={[{ /* borderWidth: 1, */ 
-        borderRadius: 100, 
-        height: 70, width: 70, 
-        alignItems: "center", 
-        justifyContent: "center", 
-        backgroundColor: "#037ffc",
-        marginLeft: windowWidth - 100
-        }, borderShadow.depth6]}>
+        <TouchableOpacity style={[{ /* borderWidth: 1, */
+            borderRadius: 100,
+            height: 70, width: 70,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#037ffc",
+            /*  marginLeft: windowWidth - 100 */
+        }, borderShadow.depth6]}
+            onPress={onPress}
+        >
             <Animated.Image
                 source={require("../assets/staticPlus.png")}
                 style={[{ height: 30, width: 30, transform: [{ rotate: spin }] }, {}]}

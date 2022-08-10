@@ -21,17 +21,18 @@ class Notifications {
             },
             () => { },
         );
-        PushNotification.getScheduledLocalNotifications(rn => {
-            console.log("sn --- ", rn)
+        PushNotification.getScheduledLocalNotifications(() => {
+            
         });
     };
 
-    scheduleNotification({date, title, message}) {
+    scheduleNotification({ date, title, message }) {
         PushNotification.localNotificationSchedule({
             channelId: "reminders",
             title: title,
             message: message,
             date,
+            /* repeatType: "day" */ //repeats every day
         })
     }
 }
