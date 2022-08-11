@@ -12,12 +12,14 @@ const Stack = createNativeStackNavigator()
 
 export default function App() {
 
-  
+
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='NotificationScreen'>
-        <Stack.Screen name="StartScreen" component={StartScreen} />
+      <Stack.Navigator /* initialRouteName='NotificationScreen' */>
+        <Stack.Screen name="StartScreen" component={StartScreen}
+          options={{ headerShown: false, }}
+        />
         <Stack.Screen name="NotificationScreen" component={NotificationScreen}
           options={{ headerShown: false, }}
         />
