@@ -9,21 +9,13 @@ import borderShadow from '../assets/borderShadow'
 import InputComponent from '../components/InputComponent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import moment from 'moment'
-
 
 const NotificationScreen = () => {
-
-    const [emptyList, setEmptyList] = useState(true)
-    let windowHeight = Dimensions.get("window").height
 
     const [date, setDate] = useState(new Date(Date.now()))
     const [datePickerOpen, setDatePickerOpen] = useState(false)
 
     const [asyncStorageData, setAsyncStorageData] = useState(null)
-
-    const fadeAnimation = useRef(new Animated.Value(0)).current;
-    const [bgHidden, setBgHidden] = useState(true)
     const [displayNotifications, setDisplayNotifications] = useState(false)
 
     const [modalOpen, setModalOpen] = useState(false)
@@ -32,6 +24,19 @@ const NotificationScreen = () => {
     const [selectedTime, setSelectedTime] = useState("Select time")
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
+
+    useEffect(() => {
+        getData()
+    }, [])
+
+
+    if (displayNotifications == false) {
+        if (asyncStorageData !== null) {
+            setDisplayNotifications(true)
+
+            /* console.log("async data: ", asyncStorageData[0].title); */
+        }
+    }
 
     const scheduleNotification = (time) => {
         /* Can set multiple alarms */
@@ -52,19 +57,6 @@ const NotificationScreen = () => {
     }
 
 
-
-    useEffect(() => {
-        getData()
-    }, [])
-
-    if (displayNotifications == false) {
-        if (asyncStorageData !== null) {
-            setDisplayNotifications(true)
-
-            /* console.log("async data: ", asyncStorageData[0].title); */
-        }
-    }
-
     const storeData = async (value) => {
         try {
             const jsonValue = JSON.stringify(value)
@@ -82,30 +74,9 @@ const NotificationScreen = () => {
         }
     }
 
-    /* 
-        const fadeInFunction = () => {
-            Animated.timing(
-                fadeAnimation, {
-                toValue: 0.5,
-                duration: 500,
-                useNativeDriver: true
-            }
-            ).start()
-        }
-    
-        const fadeOutFunction = () => {
-            Animated.timing(
-                fadeAnimation, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true
-            }
-            ).start()
-        } */
-
 
     function formatTime(time) {
-
+        /* formats 1:8 to 01:08 */
         let date = time
         let hours = date.getHours().toString()
         let min = date.getMinutes().toString()
@@ -124,10 +95,6 @@ const NotificationScreen = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
-            {bgHidden == false ? (
-                <Animated.View style={{ height: "100%", width: "100%", position: "absolute", backgroundColor: "black", opacity: fadeAnimation }}></Animated.View>
-
-            ) : (<></>)}
             <View style={{ borderWidth: 1, flex: 1, }}>
 
                 <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>Notifications</Text>
@@ -146,7 +113,6 @@ const NotificationScreen = () => {
                     }, borderShadow.depth6]}
                         onPress={() => {
                             setModalOpen(!modalOpen)
-                            setBgHidden(!bgHidden)
                         }}>
                         <Text>Add new notification</Text>
                     </TouchableOpacity>
@@ -305,7 +271,7 @@ const NotificationScreen = () => {
                         <></>
                     )}
 
-                    <View style={{ marginTop: 500 }}>
+                    {/*  <View style={{ marginTop: 500 }}>
                         <Button
                             title="get async data"
                             onPress={() => {
@@ -313,7 +279,7 @@ const NotificationScreen = () => {
                                 console.log("storage data ", asyncStorageData);
                             }}
                         />
-                    </View>
+                    </View> */} 
 
 
                 </View>
