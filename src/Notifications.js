@@ -26,13 +26,13 @@ class Notifications {
         });
     };
 
-    scheduleNotification({ date, title, message }) {
+    scheduleNotification({ date, title, message, repeat }) {
         PushNotification.localNotificationSchedule({
             channelId: "reminders",
             title: title,
             message: message,
             date,
-            /* repeatType: "day" */ //repeats every day
+            repeatType: repeat //repeats every day
         })
     }
 }
