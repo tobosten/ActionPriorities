@@ -8,6 +8,7 @@ import Notifications from '../Notifications'
 import borderShadow from '../assets/borderShadow'
 import InputComponent from '../components/InputComponent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import PushNotification from 'react-native-push-notification'
 
 
 const NotificationScreen = () => {
@@ -46,7 +47,8 @@ const NotificationScreen = () => {
             title: titleInput,
             message: messageInput,
             date: time,
-            repeat: daily
+            repeat: daily,
+            id: "10"
         })
 
         setTitleInput("")
@@ -58,17 +60,25 @@ const NotificationScreen = () => {
 
 
     const storeData = async (value) => {
+        let arr = [{ title: "Title2", message: "Message2", date: new Date(), repeat: true, id: "2" }]
         try {
-            const jsonValue = JSON.stringify(value)
-            await AsyncStorage.setItem("@storage_Key", jsonValue)
+            /*  const jsonValue = JSON.stringify(value) */
+            let data = null
+            getData(data);
+            console.log(data);
+
+            /* const jsonValue = JSON.stringify(arr)
+            console.log(jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue) */
         } catch (e) {
 
         }
     }
 
-    const getData = async () => {
+    const getData = async (data) => {
         try {
             const jsonValue = await AsyncStorage.getItem('@storage_Key')
+
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) {
         }
@@ -91,11 +101,48 @@ const NotificationScreen = () => {
         setSelectedTime(`${hours} : ${min}`)
     }
 
+    console.log(asyncStorageData)
 
+
+    const renderItem = ({ item }) => {
+
+        return (
+            <View style={{ borderWidth: 1, width: "80%", alignSelf: "center", flexDirection: "row" }}>
+                <View style={{ flex: 1, paddingLeft: 10, borderWidth: 1, }}>
+                    <Text style={{ fontStyle: "italic" }}>Title</Text>
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 20 }}>Title1</Text>
+                </View>
+                <View style={{ flex: 1, paddingHorizontal: 10, justifyContent: "center", borderWidth: 1, }}>
+                    <Text style={{ fontStyle: "italic" }}>Message</Text>
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ marginVertical: 3, }}>Message1Message1Message1</Text>
+                </View>
+                <View style={{ flex: 1, borderWidth: 1, }}>
+                    <Text style={{ fontStyle: "italic" }}>Time</Text>
+                    <Text style={{ fontSize: 20, alignSelf: "center" }}>10:00</Text>
+                </View>
+            </View >
+        )
+    }
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ borderWidth: 1, flex: 1, }}>
+                <Button
+                    title="cancel notification"
+                    onPress={() => {
+                        /* Notifications.cancelAllNotifications() */
+                        /* Notifications.cancelLocalNotification("10") */
+                        PushNotification.cancelLocalNotification("10")
+                    }}
+                />
+                <View style={{ borderWidth: 1, padding: 5 }}>
+                    <FlatList
+                        data={asyncStorageData}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => index}
+                    />
+                </View>
+
 
                 <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>Notifications</Text>
 
@@ -116,6 +163,37 @@ const NotificationScreen = () => {
                         }}>
                         <Text>Add new notification</Text>
                     </TouchableOpacity>
+
+
+                    <View style={{ marginTop: 200 }}>
+                        <Button
+                            title="get async data"
+                            onPress={() => {
+                                getData()
+                                console.log("storage data ", asyncStorageData);
+                            }}
+                        />
+                    </View>
+
+                    <View style={{ marginTop: 20 }}>
+                        <Button
+                            title="Store data"
+                            onPress={() => {
+                                storeData()
+                                console.log("Storing data", asyncStorageData);
+                            }}
+                        />
+                    </View>
+
+                    <View style={{ marginTop: 20 }}>
+                        <Button
+                            title="Remove item"
+                            onPress={async () => {
+                                await AsyncStorage.removeItem("@storage_Key")
+                                console.log("storage data ", asyncStorageData);
+                            }}
+                        />
+                    </View>
 
 
                     <Modal
@@ -271,15 +349,6 @@ const NotificationScreen = () => {
                         <></>
                     )}
 
-                    {/*  <View style={{ marginTop: 500 }}>
-                        <Button
-                            title="get async data"
-                            onPress={() => {
-                                getData()
-                                console.log("storage data ", asyncStorageData);
-                            }}
-                        />
-                    </View> */} 
 
 
                 </View>

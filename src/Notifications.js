@@ -22,18 +22,30 @@ class Notifications {
             () => { },
         );
         PushNotification.getScheduledLocalNotifications(() => {
-            
+
         });
     };
 
-    scheduleNotification({ date, title, message, repeat }) {
+    scheduleNotification({ date, id, title, message, repeat }) {
         PushNotification.localNotificationSchedule({
             channelId: "reminders",
+            id: id,
             title: title,
             message: message,
             date,
-            repeatType: repeat //repeats every day
+            repeatType: repeat //repeats  month | week | day | hour | minute
         })
+
+    }
+/* 
+    cancelLocalNotification({ id }) {
+        PushNotification.cancelLocalNotification({ id: `${id}` })
+
+
+    } */
+
+    cancelAllNotifications() {
+        PushNotification.cancelAllLocalNotifications()
     }
 }
 
