@@ -32,17 +32,17 @@ class Notifications {
             id: id,
             title: title,
             message: message,
-            date,
+            date: date,
             repeatType: repeat //repeats  month | week | day | hour | minute
         })
 
     }
-/* 
-    cancelLocalNotification({ id }) {
-        PushNotification.cancelLocalNotification({ id: `${id}` })
-
-
-    } */
+    /* 
+        cancelLocalNotification({ id }) {
+            PushNotification.cancelLocalNotification({ id: `${id}` })
+    
+    
+        } */
 
     cancelAllNotifications() {
         PushNotification.cancelAllLocalNotifications()

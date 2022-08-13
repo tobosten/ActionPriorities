@@ -26,10 +26,13 @@ const NotificationScreen = () => {
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
 
+
+    const [listRefresh, setListRefresh] = useState(false)
+
     useEffect(() => {
         getData()
-  
-    }, [asyncStorageData])
+
+    }, [listRefresh])
 
 
     if (displayNotifications == false) {
@@ -41,13 +44,16 @@ const NotificationScreen = () => {
     const scheduleNotification = (time) => {
         /* Can set multiple alarms */
         let daily = null
+        let id = "1"
         dailyRepeat == true ? daily = "day" : null;
+        /* asyncStorageData == null ? id == "0" : id == `${asyncStorageData.length + 1}` */
+
         let object = {
             title: titleInput,
             message: messageInput,
             date: time,
             repeat: daily,
-            id: `${asyncStorageData.length + 1}`
+            id: `${id}`
         }
 
         Notifications.scheduleNotification({
@@ -67,35 +73,36 @@ const NotificationScreen = () => {
     }
 
 
-    const storeData = async (object) => {
+    const storeData = (object) => {
         /* Needs refresh button for async list to update in notification screen atm. */
+
+        let jsonValue = null
+
         try {
-            let jsonValue = ""
-            if (asyncStorageData == null) {
-                jsonValue = JSON.stringify([obj])
-            } else {
-                jsonValue = JSON.stringify(
-                    [...asyncStorageData,
-                    {
-                        title: object.title,
-                        message: object.message,
-                        date: object.date,
-                        repeat: object.daily,
-                        id: object.id
-                    }]
-                )
+            jsonValue = JSON.stringify(
+                [...asyncStorageData,
+                {
+                    title: object.title,
+                    message: object.message,
+                    date: object.date,
+                    repeat: object.daily,
+                    id: object.id
+                }]
+            )
+            console.log("Storing data: ", jsonValue)
+            AsyncStorage.setItem("@storage_Key", jsonValue)
+        } catch {
+            jsonValue = JSON.stringify([object])
 
-            }
-            await AsyncStorage.setItem("@storage_Key", jsonValue)
-        } catch (e) {
-
+            console.log("Storing data: ", jsonValue)
+            AsyncStorage.setItem("@storage_Key", jsonValue)
         }
     }
 
     const getData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem('@storage_Key')
-
+            let jsonValue = await AsyncStorage.getItem('@storage_Key')
+            console.log("Getting Data: ", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) {
         }
@@ -165,13 +172,22 @@ const NotificationScreen = () => {
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ /* borderWidth: 1,  */flex: 1, }}>
 
-                {/* <Button
+                <Button
                     title="cancel notification"
                     onPress={() => {
                         Notifications.cancelAllNotifications()
-                        PushNotification.cancelLocalNotification("2")
+                        AsyncStorage.clear()
+                        /* PushNotification.cancelLocalNotification("2") */
                     }}
-                /> */}
+                />
+
+                <Button
+                    title="Async storage data"
+                    onPress={() => {
+                        getData()
+
+                    }}
+                />
 
                 <View style={{ flex: 0.1, }}>
 
@@ -348,7 +364,7 @@ const NotificationScreen = () => {
                             onPress={() => {
                                 setModalOpen(!modalOpen)
                                 scheduleNotification(date)
-
+                                setListRefresh(!listRefresh)
                             }}>
                             <Text style={{ fontSize: 18 }}>Confirm</Text>
                         </TouchableOpacity>
