@@ -28,7 +28,8 @@ const NotificationScreen = () => {
 
     useEffect(() => {
         getData()
-    }, [])
+  
+    }, [asyncStorageData])
 
 
     if (displayNotifications == false) {
@@ -158,9 +159,11 @@ const NotificationScreen = () => {
         )
     }
 
+    let windowWidth = Dimensions.get("window").width
+    let windowHeight = Dimensions.get("window").height
     return (
         <SafeAreaView style={{ flex: 1, }}>
-            <View style={{ borderWidth: 1, flex: 1, }}>
+            <View style={{ /* borderWidth: 1,  */flex: 1, }}>
 
                 {/* <Button
                     title="cancel notification"
@@ -170,18 +173,21 @@ const NotificationScreen = () => {
                     }}
                 /> */}
 
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ marginLeft: 10, fontSize: 24 }}>Notifications</Text>
-                    <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10 }}
-                        onPress={() => { }}>
-                        <Image
-                            source={require("../assets/refreshImage.png")}
-                            style={{ height: 40, width: 40 }}
-                        />
-                    </TouchableOpacity>
+                <View style={{ flex: 0.1, }}>
+
+                    <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
+                        <Text style={{ marginLeft: 10, fontSize: 24 }}>Notifications</Text>
+                        <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10 }}
+                            onPress={() => { }}>
+                            <Image
+                                source={require("../assets/refreshImage.png")}
+                                style={{ height: 40, width: 40 }}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                <View style={{ borderWidth: 1, padding: 5 }}>
+                <View style={{ flex: 1.2, }}>
                     <FlatList
                         data={asyncStorageData}
                         renderItem={renderItem}
@@ -189,192 +195,166 @@ const NotificationScreen = () => {
                     />
                 </View>
 
-                <View style={{ flex: 1, }}>
 
-                    <View style={{ marginLeft: "auto", marginTop: "auto", marginRight: 15, marginBottom: 20 }}>
-                        <FAB
+                <View style={[{ flex: 0.2, backgroundColor: "white", justifyContent: "center", borderTopLeftRadius: 10, borderTopRightRadius: 10, borderTopWidth: 1, borderColor: "lightgray" }, borderShadow.depth24]}>
+
+
+                    <TouchableOpacity style={[{
+                        backgroundColor: "#037ffc",
+                        width: "80%",
+                        alignSelf: "center",
+                        paddingVertical: 15,
+                        borderRadius: 5
+                    }, borderShadow.depth6]} onPress={() => { setModalOpen(!modalOpen) }}>
+                        <Text style={{
+                            textAlign: "center",
+                            color: "white",
+                            fontWeight: "500",
+                            fontSize: 18
+                        }}>New Notification</Text>
+                    </TouchableOpacity>
+
+
+                </View>
+            </View>
+
+
+            <Modal
+                animationType='slide'
+                visible={modalOpen}
+            >
+                <View style={{ flex: 1, }}>
+                    <View>
+                        <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>New notification</Text>
+                    </View>
+                    <View style={{ alignItems: "center" }}>
+                        <InputComponent
+                            title={"Title"}
+                            value={titleInput}
+                            valueChange={setTitleInput}
+                            viewStyle={{ marginTop: 50 }}
+                            inputStyle={{ paddingVertical: 5, paddingTop: 15 }}
+                        />
+
+                        <InputComponent
+                            title={"Message"}
+                            value={messageInput}
+                            valueChange={setMessageInput}
+                            viewStyle={{ marginTop: 20 }}
+                            inputStyle={{ height: 100, paddingVertical: 5, paddingTop: 15 }}
+                        />
+                    </View>
+
+                    <View style={{ alignItems: "center" }}>
+                        <TouchableOpacity style={[{
+                            backgroundColor: timeBool == false ? "white" : "#037ffc",
+                            padding: 5,
+                            borderRadius: 8,
+                            marginTop: 20,
+                            width: "80%",
+                            height: 50,
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }, borderShadow.depth6]}
                             onPress={() => {
-                                setModalOpen(!modalOpen)
+                                setDatePickerOpen(!datePickerOpen)
+                                setDate(new Date(Date.now()))
+                            }}>
+                            <Text style={{
+                                fontSize: 18,
+                                color: timeBool == false ? "black" : "white",
+                                fontWeight: timeBool == false ? "400" : "600"
+                            }}>{selectedTime}</Text>
+                        </TouchableOpacity>
+
+                        <DatePicker
+                            date={date}
+                            open={datePickerOpen}
+                            modal
+                            mode='datetime'
+                            is24hourSource='locale'
+                            onConfirm={(time) => {
+                                setDatePickerOpen(!datePickerOpen)
+                                formatTime(time)
+                                setDate(time)
+                                timeBool == false ? setTimeBool(true) : null
+                            }}
+                            onCancel={() => {
+                                setDatePickerOpen(!datePickerOpen)
                             }}
                         />
                     </View>
 
+                    <View style={{}}>
+                        <TouchableOpacity style={[{
+                            padding: 5,
+                            backgroundColor: dailyRepeat == false ? "white" : "#037ffc",
+                            borderRadius: 8,
+                            marginTop: 20,
+                            width: 170,
+                            height: 50,
+                            alignItems: "center",
+                            marginLeft: "auto",
+                            marginRight: "10%",
+                            flexDirection: "row"
+                        }, borderShadow.depth6]}
+                            onPress={() => {
+                                setDailyRepeat(!dailyRepeat)
+                            }}
+                        >
+                            <Text style={{
+                                fontSize: 18,
+                                textAlign: "center",
+                                width: "100%",
+                                color: dailyRepeat == false ? "black" : "white",
+                                fontWeight: dailyRepeat == false ? "400" : "600"
+                            }}>Daily repeat</Text>
+                            {/* <View style={{ width: 5, height: "90%", backgroundColor: dailyRepeat == false ? "white" : "#037ffc", borderRadius: 50, position: "absolute", marginLeft: 5, }} /> */}
+                        </TouchableOpacity>
+                    </View>
 
 
+                    <View style={{ flexDirection: "row", marginTop: "15%", marginLeft: "auto", marginRight: "10%" }}>
+                        <TouchableOpacity style={[{
+                            paddingVertical: 10,
+                            paddingHorizontal: 15,
+                            borderRadius: 5,
+                            height: 50,
+                            marginHorizontal: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            backgroundColor: "white"
+                        }, borderShadow.depth6]}
+                            onPress={() => {
+                                setModalOpen(!modalOpen)
+                                setTitleInput("")
+                                setMessageInput("")
+                                setSelectedTime("Select time")
+                                setTimeBool(false)
+                                setDailyRepeat(false)
+                            }}>
+                            <Text style={{ fontSize: 18 }}>Cancel</Text>
+                        </TouchableOpacity >
+                        <TouchableOpacity style={[{
+                            paddingVertical: 10,
+                            paddingHorizontal: 15,
+                            borderRadius: 5,
+                            height: 50,
+                            marginHorizontal: 5,
+                            backgroundColor: "white",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }, borderShadow.depth6]}
+                            onPress={() => {
+                                setModalOpen(!modalOpen)
+                                scheduleNotification(date)
 
-
-                    {/*  <View style={{ flexDirection: "row" }}>
-                        <View style={{}}>
-                            <Button
-                                title="get async data"
-                                onPress={() => {
-                                    getData()
-                                    console.log("storage data ", asyncStorageData);
-                                }}
-                            />
-                        </View>
-
-                        <View style={{}}>
-                            <Button
-                                title="Store data"
-                                onPress={() => {
-                                    storeData()
-
-                                }}
-                            />
-                        </View>
-
-                        <View style={{}}>
-                            <Button
-                                title="Remove item"
-                                onPress={async () => {
-                                    await AsyncStorage.removeItem("@storage_Key")
-                                    console.log("storage data ", asyncStorageData);
-                                }}
-                            />
-                        </View>
-                    </View> */}
-
-
-
-                    <Modal
-                        animationType='slide'
-                        visible={modalOpen}
-                    >
-                        <View style={{ flex: 1, }}>
-                            <View>
-                                <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>New notification</Text>
-                            </View>
-                            <View style={{ alignItems: "center" }}>
-                                <InputComponent
-                                    title={"Title"}
-                                    value={titleInput}
-                                    valueChange={setTitleInput}
-                                    viewStyle={{ marginTop: 50 }}
-                                    inputStyle={{ paddingVertical: 5, paddingTop: 15 }}
-                                />
-
-                                <InputComponent
-                                    title={"Message"}
-                                    value={messageInput}
-                                    valueChange={setMessageInput}
-                                    viewStyle={{ marginTop: 20 }}
-                                    inputStyle={{ height: 100, paddingVertical: 5, paddingTop: 15 }}
-                                />
-                            </View>
-
-                            <View style={{ alignItems: "center" }}>
-                                <TouchableOpacity style={[{
-                                    backgroundColor: timeBool == false ? "white" : "#037ffc",
-                                    padding: 5,
-                                    borderRadius: 8,
-                                    marginTop: 20,
-                                    width: "80%",
-                                    height: 50,
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                }, borderShadow.depth6]}
-                                    onPress={() => {
-                                        setDatePickerOpen(!datePickerOpen)
-                                        setDate(new Date(Date.now()))
-                                    }}>
-                                    <Text style={{
-                                        fontSize: 18,
-                                        color: timeBool == false ? "black" : "white",
-                                        fontWeight: timeBool == false ? "400" : "600"
-                                    }}>{selectedTime}</Text>
-                                </TouchableOpacity>
-
-                                <DatePicker
-                                    date={date}
-                                    open={datePickerOpen}
-                                    modal
-                                    mode='datetime'
-                                    is24hourSource='locale'
-                                    onConfirm={(time) => {
-                                        setDatePickerOpen(!datePickerOpen)
-                                        formatTime(time)
-                                        setDate(time)
-                                        timeBool == false ? setTimeBool(true) : null
-                                    }}
-                                    onCancel={() => {
-                                        setDatePickerOpen(!datePickerOpen)
-                                    }}
-                                />
-                            </View>
-
-                            <View style={{}}>
-                                <TouchableOpacity style={[{
-                                    padding: 5,
-                                    backgroundColor: dailyRepeat == false ? "white" : "#037ffc",
-                                    borderRadius: 8,
-                                    marginTop: 20,
-                                    width: 170,
-                                    height: 50,
-                                    alignItems: "center",
-                                    marginLeft: "auto",
-                                    marginRight: "10%",
-                                    flexDirection: "row"
-                                }, borderShadow.depth6]}
-                                    onPress={() => {
-                                        setDailyRepeat(!dailyRepeat)
-                                    }}
-                                >
-                                    <Text style={{
-                                        fontSize: 18,
-                                        textAlign: "center",
-                                        width: "100%",
-                                        color: dailyRepeat == false ? "black" : "white",
-                                        fontWeight: dailyRepeat == false ? "400" : "600"
-                                    }}>Daily repeat</Text>
-                                    {/* <View style={{ width: 5, height: "90%", backgroundColor: dailyRepeat == false ? "white" : "#037ffc", borderRadius: 50, position: "absolute", marginLeft: 5, }} /> */}
-                                </TouchableOpacity>
-                            </View>
-
-
-                            <View style={{ flexDirection: "row", marginTop: "15%", marginLeft: "auto", marginRight: "10%" }}>
-                                <TouchableOpacity style={[{
-                                    paddingVertical: 10,
-                                    paddingHorizontal: 15,
-                                    borderRadius: 5,
-                                    height: 50,
-                                    marginHorizontal: 5,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    backgroundColor: "white"
-                                }, borderShadow.depth6]}
-                                    onPress={() => {
-                                        setModalOpen(!modalOpen)
-                                        setTitleInput("")
-                                        setMessageInput("")
-                                        setSelectedTime("Select time")
-                                        setTimeBool(false)
-                                        setDailyRepeat(false)
-                                    }}>
-                                    <Text style={{ fontSize: 18 }}>Cancel</Text>
-                                </TouchableOpacity >
-                                <TouchableOpacity style={[{
-                                    paddingVertical: 10,
-                                    paddingHorizontal: 15,
-                                    borderRadius: 5,
-                                    height: 50,
-                                    marginHorizontal: 5,
-                                    backgroundColor: "white",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }, borderShadow.depth6]}
-                                    onPress={() => {
-                                        setModalOpen(!modalOpen)
-                                        scheduleNotification(date)
-
-                                    }}>
-                                    <Text style={{ fontSize: 18 }}>Confirm</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </Modal>
+                            }}>
+                            <Text style={{ fontSize: 18 }}>Confirm</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
+            </Modal>
         </SafeAreaView >
     )
 }
