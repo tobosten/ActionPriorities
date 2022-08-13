@@ -37,7 +37,7 @@ const FAB = ({ onPress }) => {
         >
             <Animated.Image
                 source={require("../assets/staticPlus.png")}
-                style={[{ height: 30, width: 30, transform: [{ rotate: spin }] }, {}]}
+                style={[{ height: 30, width: 30,/*  transform: [{ rotate: spin }] */ }, {}]}
             />
         </TouchableOpacity>
     )
