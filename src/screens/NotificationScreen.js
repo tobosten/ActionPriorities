@@ -34,8 +34,6 @@ const NotificationScreen = () => {
     if (displayNotifications == false) {
         if (asyncStorageData !== null) {
             setDisplayNotifications(true)
-
-            /* console.log("async data: ", asyncStorageData[0].title); */
         }
     }
 
@@ -43,14 +41,23 @@ const NotificationScreen = () => {
         /* Can set multiple alarms */
         let daily = null
         dailyRepeat == true ? daily = "day" : null;
-        Notifications.scheduleNotification({
+        let object = {
             title: titleInput,
             message: messageInput,
             date: time,
             repeat: daily,
-            id: "10"
+            id: `${asyncStorageData.length + 1}`
+        }
+
+        Notifications.scheduleNotification({
+            title: object.title,
+            message: object.message,
+            date: time,
+            repeat: object.daily,
+            id: object.id
         })
 
+        storeData(object)
         setTitleInput("")
         setMessageInput("")
         setSelectedTime("Select time")
@@ -59,23 +66,32 @@ const NotificationScreen = () => {
     }
 
 
-    const storeData = async (value) => {
-        let arr = [{ title: "Title2", message: "Message2", date: new Date(), repeat: true, id: "2" }]
+    const storeData = async (object) => {
+        /* Needs refresh button for async list to update in notification screen atm. */
         try {
-            /*  const jsonValue = JSON.stringify(value) */
-            let data = null
-            getData(data);
-            console.log(data);
+            let jsonValue = ""
+            if (asyncStorageData == null) {
+                jsonValue = JSON.stringify([obj])
+            } else {
+                jsonValue = JSON.stringify(
+                    [...asyncStorageData,
+                    {
+                        title: object.title,
+                        message: object.message,
+                        date: object.date,
+                        repeat: object.daily,
+                        id: object.id
+                    }]
+                )
 
-            /* const jsonValue = JSON.stringify(arr)
-            console.log(jsonValue)
-            await AsyncStorage.setItem("@storage_Key", jsonValue) */
+            }
+            await AsyncStorage.setItem("@storage_Key", jsonValue)
         } catch (e) {
 
         }
     }
 
-    const getData = async (data) => {
+    const getData = async () => {
         try {
             const jsonValue = await AsyncStorage.getItem('@storage_Key')
 
@@ -101,40 +117,70 @@ const NotificationScreen = () => {
         setSelectedTime(`${hours} : ${min}`)
     }
 
-    console.log(asyncStorageData)
-
 
     const renderItem = ({ item }) => {
+        let monthArray = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "Novermber", "December"]
+        let newDate = new Date(item.date)
+
+        let day = newDate.getDay()
+        let month = newDate.getMonth()
+        let hours = newDate.getHours()
+        let min = newDate.getMinutes()
 
         return (
-            <View style={{ borderWidth: 1, width: "80%", alignSelf: "center", flexDirection: "row" }}>
-                <View style={{ flex: 1, paddingLeft: 10, borderWidth: 1, }}>
-                    <Text style={{ fontStyle: "italic" }}>Title</Text>
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 20 }}>Title1</Text>
+            <View style={[{ /* borderWidth: 1, */borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}>
+
+                <View style={{ /* borderWidth: 1,  */flex: 1, padding: 5, }}>
+                    <Text style={{ marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17 }}>{item.title}</Text>
+                    <View style={[{ padding: 5, margin: 5, borderRadius: 5, borderTopWidth: 1, borderColor: "lightgray" }]}>
+                        <Text>{item.message}</Text>
+                    </View>
                 </View>
-                <View style={{ flex: 1, paddingHorizontal: 10, justifyContent: "center", borderWidth: 1, }}>
-                    <Text style={{ fontStyle: "italic" }}>Message</Text>
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ marginVertical: 3, }}>Message1Message1Message1</Text>
-                </View>
-                <View style={{ flex: 1, borderWidth: 1, }}>
-                    <Text style={{ fontStyle: "italic" }}>Time</Text>
-                    <Text style={{ fontSize: 20, alignSelf: "center" }}>10:00</Text>
-                </View>
-            </View >
+
+                <View style={{ width: 1, height: "70%", backgroundColor: "lightgray", alignSelf: "center" }} />
+
+                {item.repeat == true ? (
+                    <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{}}>Daily</Text>
+                        <View style={{ marginVertical: 3, }} />
+                        <Text>{`${hours}:${min}`}</Text>
+                    </View>
+                ) : (
+                    <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{}}>{`${monthArray[month]} ${day}`}</Text>
+                        <View style={{ marginVertical: 3, }} />
+                        <Text>{`${hours}:${min}`}</Text>
+                    </View>
+                )
+                }
+            </View>
         )
     }
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ borderWidth: 1, flex: 1, }}>
-                <Button
+
+                {/* <Button
                     title="cancel notification"
                     onPress={() => {
-                        /* Notifications.cancelAllNotifications() */
-                        /* Notifications.cancelLocalNotification("10") */
-                        PushNotification.cancelLocalNotification("10")
+                        Notifications.cancelAllNotifications()
+                        PushNotification.cancelLocalNotification("2")
                     }}
-                />
+                /> */}
+
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ marginLeft: 10, fontSize: 24 }}>Notifications</Text>
+                    <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10 }}
+                        onPress={() => { }}>
+                        <Image
+                            source={require("../assets/refreshImage.png")}
+                            style={{ height: 40, width: 40 }}
+                        />
+                    </TouchableOpacity>
+                </View>
+
                 <View style={{ borderWidth: 1, padding: 5 }}>
                     <FlatList
                         data={asyncStorageData}
@@ -143,57 +189,52 @@ const NotificationScreen = () => {
                     />
                 </View>
 
+                <View style={{ flex: 1, }}>
 
-                <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>Notifications</Text>
-
-                <View style={{ alignItems: "center", }}>
-
-                    <TouchableOpacity style={[{
-                        backgroundColor: "lightgray",
-                        width: "80%",
-                        height: 50,
-                        borderRadius: 8,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        marginVertical: 20,
-                        zIndex: -10
-                    }, borderShadow.depth6]}
-                        onPress={() => {
-                            setModalOpen(!modalOpen)
-                        }}>
-                        <Text>Add new notification</Text>
-                    </TouchableOpacity>
-
-
-                    <View style={{ marginTop: 200 }}>
-                        <Button
-                            title="get async data"
+                    <View style={{ marginLeft: "auto", marginTop: "auto", marginRight: 15, marginBottom: 20 }}>
+                        <FAB
                             onPress={() => {
-                                getData()
-                                console.log("storage data ", asyncStorageData);
+                                setModalOpen(!modalOpen)
                             }}
                         />
                     </View>
 
-                    <View style={{ marginTop: 20 }}>
-                        <Button
-                            title="Store data"
-                            onPress={() => {
-                                storeData()
-                                console.log("Storing data", asyncStorageData);
-                            }}
-                        />
-                    </View>
 
-                    <View style={{ marginTop: 20 }}>
-                        <Button
-                            title="Remove item"
-                            onPress={async () => {
-                                await AsyncStorage.removeItem("@storage_Key")
-                                console.log("storage data ", asyncStorageData);
-                            }}
-                        />
-                    </View>
+
+
+
+                    {/*  <View style={{ flexDirection: "row" }}>
+                        <View style={{}}>
+                            <Button
+                                title="get async data"
+                                onPress={() => {
+                                    getData()
+                                    console.log("storage data ", asyncStorageData);
+                                }}
+                            />
+                        </View>
+
+                        <View style={{}}>
+                            <Button
+                                title="Store data"
+                                onPress={() => {
+                                    storeData()
+
+                                }}
+                            />
+                        </View>
+
+                        <View style={{}}>
+                            <Button
+                                title="Remove item"
+                                onPress={async () => {
+                                    await AsyncStorage.removeItem("@storage_Key")
+                                    console.log("storage data ", asyncStorageData);
+                                }}
+                            />
+                        </View>
+                    </View> */}
+
 
 
                     <Modal
@@ -330,32 +371,10 @@ const NotificationScreen = () => {
                                     <Text style={{ fontSize: 18 }}>Confirm</Text>
                                 </TouchableOpacity>
                             </View>
-
                         </View>
-
                     </Modal>
-
-                    {displayNotifications == true ? (
-                        <FlatList
-                            data={asyncStorageData}
-                            renderItem={(item, i) => {
-                                return (
-                                    <Text>{ }</Text>
-                                )
-                            }}
-                            keyExtractor={(item, index) => index}
-                        />
-                    ) : (
-                        <></>
-                    )}
-
-
-
                 </View>
-
-
             </View>
-
         </SafeAreaView >
     )
 }
