@@ -26,7 +26,18 @@ class Notifications {
         });
     };
 
-    scheduleNotification({ date, id, title, message, repeat }) {
+    scheduleNotification({ date, id, title, message }) {
+        PushNotification.localNotificationSchedule({
+            channelId: "reminders",
+            id: id,
+            title: title,
+            message: message,
+            date: date,
+        })
+    }
+
+    
+    scheduleNotificationRepeat({ date, id, title, message, repeat }) {
         PushNotification.localNotificationSchedule({
             channelId: "reminders",
             id: id,

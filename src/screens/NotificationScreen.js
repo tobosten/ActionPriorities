@@ -43,26 +43,49 @@ const NotificationScreen = () => {
 
     const scheduleNotification = (time) => {
         /* Can set multiple alarms */
-        let daily = null
-        let id = "1"
-        dailyRepeat == true ? daily = "day" : null;
-        /* asyncStorageData == null ? id == "0" : id == `${asyncStorageData.length + 1}` */
+        /* let daily = null */
 
-        let object = {
-            title: titleInput,
-            message: messageInput,
-            date: time,
-            repeat: daily,
-            id: `${id}`
+
+        /* dailyRepeat == true ? daily == "day" : null; */
+
+        let id = ""
+        asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // might get duplicate id if deleting
+
+        let object = {}
+        if (dailyRepeat == true) {
+            Notifications.scheduleNotificationRepeat({
+                title: object.title,
+                message: object.message,
+                date: time,
+                repeat: "day",
+                id: object.id
+            })
+
+            object = {
+                title: titleInput,
+                message: messageInput,
+                date: time,
+                repeat: "day",
+                id: `${id}`
+            }
+        } else {
+            Notifications.scheduleNotification({
+                title: object.title,
+                message: object.message,
+                date: time,
+                id: object.id
+            })
+
+            object = {
+                title: titleInput,
+                message: messageInput,
+                date: time,
+                id: `${id}`
+            }
         }
 
-        Notifications.scheduleNotification({
-            title: object.title,
-            message: object.message,
-            date: time,
-            repeat: object.daily,
-            id: object.id
-        })
+
+
 
         storeData(object)
         setTitleInput("")
@@ -73,7 +96,7 @@ const NotificationScreen = () => {
     }
 
 
-    const storeData = (object) => {
+    const storeData = async (object) => {
         /* Needs refresh button for async list to update in notification screen atm. */
 
         let jsonValue = null
@@ -90,13 +113,15 @@ const NotificationScreen = () => {
                 }]
             )
             console.log("Storing data: ", jsonValue)
-            AsyncStorage.setItem("@storage_Key", jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue)
         } catch {
             jsonValue = JSON.stringify([object])
 
             console.log("Storing data: ", jsonValue)
-            AsyncStorage.setItem("@storage_Key", jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue)
         }
+
+
     }
 
     const getData = async () => {
@@ -133,8 +158,11 @@ const NotificationScreen = () => {
 
         let day = newDate.getDay()
         let month = newDate.getMonth()
-        let hours = newDate.getHours()
-        let min = newDate.getMinutes()
+        let hours = newDate.getHours().toString()
+        let min = newDate.getMinutes().toString()
+
+        hours.length < 2 ? hours = `0${hours}` : null;
+        min.length < 2 ? min = `0${min}` : null;
 
         return (
             <View style={[{ /* borderWidth: 1, */borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}>
@@ -148,7 +176,7 @@ const NotificationScreen = () => {
 
                 <View style={{ width: 1, height: "70%", backgroundColor: "lightgray", alignSelf: "center" }} />
 
-                {item.repeat == true ? (
+                {item.repeat == "day" ? (
                     <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
                         <Text style={{}}>Daily</Text>
                         <View style={{ marginVertical: 3, }} />
@@ -177,7 +205,7 @@ const NotificationScreen = () => {
                     onPress={() => {
                         Notifications.cancelAllNotifications()
                         AsyncStorage.clear()
-                        /* PushNotification.cancelLocalNotification("2") */
+                        //PushNotification.cancelLocalNotification("2")
                     }}
                 />
 
@@ -203,7 +231,7 @@ const NotificationScreen = () => {
                     </View>
                 </View>
 
-                <View style={{ flex: 1.2, }}>
+                <View style={{ flex: 1.2, paddingTop: 20 }}>
                     <FlatList
                         data={asyncStorageData}
                         renderItem={renderItem}
