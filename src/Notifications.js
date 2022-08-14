@@ -22,7 +22,6 @@ class Notifications {
             () => { },
         );
         PushNotification.getScheduledLocalNotifications(() => {
-
         });
     };
 
@@ -36,7 +35,7 @@ class Notifications {
         })
     }
 
-    
+
     scheduleNotificationRepeat({ date, id, title, message, repeat }) {
         PushNotification.localNotificationSchedule({
             channelId: "reminders",

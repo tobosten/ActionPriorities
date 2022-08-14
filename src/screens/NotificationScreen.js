@@ -9,7 +9,7 @@ import borderShadow from '../assets/borderShadow'
 import InputComponent from '../components/InputComponent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import PushNotification from 'react-native-push-notification'
-
+import moment from 'moment'
 
 const NotificationScreen = () => {
 
@@ -17,7 +17,6 @@ const NotificationScreen = () => {
     const [datePickerOpen, setDatePickerOpen] = useState(false)
 
     const [asyncStorageData, setAsyncStorageData] = useState(null)
-    const [displayNotifications, setDisplayNotifications] = useState(false)
 
     const [modalOpen, setModalOpen] = useState(false)
     const [titleInput, setTitleInput] = useState("")
@@ -25,33 +24,26 @@ const NotificationScreen = () => {
     const [selectedTime, setSelectedTime] = useState("Select time")
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
-
-
     const [listRefresh, setListRefresh] = useState(false)
 
     useEffect(() => {
         getData()
-
     }, [listRefresh])
 
 
-    if (displayNotifications == false) {
-        if (asyncStorageData !== null) {
-            setDisplayNotifications(true)
-        }
-    }
-
     const scheduleNotification = (time) => {
         /* Can set multiple alarms */
-        /* let daily = null */
-
-
-        /* dailyRepeat == true ? daily == "day" : null; */
 
         let id = ""
-        asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // might get duplicate id if deleting
+        asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // will get duplicate id if deleting
 
-        let object = {}
+        console.log("Daily repeat", dailyRepeat)
+        let object = {
+            title: titleInput,
+            message: messageInput,
+            date: time,
+            id: `${id}`
+        }
         if (dailyRepeat == true) {
             Notifications.scheduleNotificationRepeat({
                 title: object.title,
@@ -60,33 +52,9 @@ const NotificationScreen = () => {
                 repeat: "day",
                 id: object.id
             })
-
-            object = {
-                title: titleInput,
-                message: messageInput,
-                date: time,
-                repeat: "day",
-                id: `${id}`
-            }
         } else {
-            Notifications.scheduleNotification({
-                title: object.title,
-                message: object.message,
-                date: time,
-                id: object.id
-            })
-
-            object = {
-                title: titleInput,
-                message: messageInput,
-                date: time,
-                id: `${id}`
-            }
+            Notifications.scheduleNotification(object)
         }
-
-
-
-
         storeData(object)
         setTitleInput("")
         setMessageInput("")
@@ -102,26 +70,42 @@ const NotificationScreen = () => {
         let jsonValue = null
 
         try {
-            jsonValue = JSON.stringify(
-                [...asyncStorageData,
-                {
-                    title: object.title,
-                    message: object.message,
-                    date: object.date,
-                    repeat: object.daily,
-                    id: object.id
-                }]
-            )
-            console.log("Storing data: ", jsonValue)
-            await AsyncStorage.setItem("@storage_Key", jsonValue)
+            if (asyncStorageData !== null) {
+                jsonValue = JSON.stringify(
+                    [...asyncStorageData,
+                    {
+                        title: object.title,
+                        message: object.message,
+                        date: object.date,
+                        repeat: "day",
+                        id: object.id
+                    }]
+                )
+                console.log("New data: ", jsonValue)
+                await AsyncStorage.setItem("@storage_Key", jsonValue)
+            } else if (asyncStorageData == null) {
+                jsonValue = JSON.stringify(
+                    [{
+                        title: object.title,
+                        message: object.message,
+                        date: object.date,
+                        repeat: object.daily,
+                        id: object.id
+                    }]
+                )
+                console.log("New data: ", jsonValue)
+                await AsyncStorage.setItem("@storage_Key", jsonValue)
+            }
+
         } catch {
-            jsonValue = JSON.stringify([object])
+            /* jsonValue = JSON.stringify([object])
 
             console.log("Storing data: ", jsonValue)
-            await AsyncStorage.setItem("@storage_Key", jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue) */
+            console.log("Failed to store data");
         }
 
-
+        setListRefresh(!listRefresh)
     }
 
     const getData = async () => {
@@ -129,8 +113,7 @@ const NotificationScreen = () => {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
             console.log("Getting Data: ", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
-        } catch (e) {
-        }
+        } catch (e) { }
     }
 
 
@@ -156,10 +139,12 @@ const NotificationScreen = () => {
             "July", "August", "September", "October", "Novermber", "December"]
         let newDate = new Date(item.date)
 
-        let day = newDate.getDay()
-        let month = newDate.getMonth()
-        let hours = newDate.getHours().toString()
-        let min = newDate.getMinutes().toString()
+        let d = moment(item.date)
+
+        let day = d.format("Do")
+        let month = d.format("MMM")
+        let hours = d.format("HH")
+        let min = d.format("MM")
 
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
@@ -184,7 +169,7 @@ const NotificationScreen = () => {
                     </View>
                 ) : (
                     <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{}}>{`${monthArray[month]} ${day}`}</Text>
+                        <Text style={{}}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
                     </View>
@@ -205,7 +190,9 @@ const NotificationScreen = () => {
                     onPress={() => {
                         Notifications.cancelAllNotifications()
                         AsyncStorage.clear()
+
                         //PushNotification.cancelLocalNotification("2")
+                        getData()
                     }}
                 />
 
@@ -249,7 +236,10 @@ const NotificationScreen = () => {
                         alignSelf: "center",
                         paddingVertical: 15,
                         borderRadius: 5
-                    }, borderShadow.depth6]} onPress={() => { setModalOpen(!modalOpen) }}>
+                    }, borderShadow.depth6]} onPress={() => {
+                        setModalOpen(!modalOpen)
+                        setDate(new Date(Date.now()))
+                    }}>
                         <Text style={{
                             textAlign: "center",
                             color: "white",
@@ -302,7 +292,7 @@ const NotificationScreen = () => {
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 setDatePickerOpen(!datePickerOpen)
-                                setDate(new Date(Date.now()))
+                                /* setDate(new Date()) */
                             }}>
                             <Text style={{
                                 fontSize: 18,
@@ -392,7 +382,7 @@ const NotificationScreen = () => {
                             onPress={() => {
                                 setModalOpen(!modalOpen)
                                 scheduleNotification(date)
-                                setListRefresh(!listRefresh)
+
                             }}>
                             <Text style={{ fontSize: 18 }}>Confirm</Text>
                         </TouchableOpacity>
