@@ -27,6 +27,7 @@ const NotificationScreen = () => {
     const [listRefresh, setListRefresh] = useState(false)
     const [swipeLeft, setSwipeLeft] = useState(0)
 
+
     useEffect(() => {
         getData()
     }, [listRefresh])
@@ -37,26 +38,22 @@ const NotificationScreen = () => {
         let id = ""
         asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // will get duplicate id if deleting
 
-        console.log("Daily repeat", dailyRepeat)
         let object = {
             title: titleInput,
             message: messageInput,
             date: time,
+            repeat: dailyRepeat == true ? "day" : "",
             id: `${id}`
         }
-        if (dailyRepeat == true) {
-            Notifications.scheduleNotificationRepeat({
-                title: object.title,
-                message: object.message,
-                date: time,
-                repeat: "day",
-                id: object.id
-            })
-        } else {
-            Notifications.scheduleNotification(object)
-        }
+
+        Notifications.scheduleNotificationRepeat(object)
+
         storeData(object)
-        resetStates()
+        setTitleInput("")
+        setMessageInput("")
+        setSelectedTime("Select time")
+        setTimeBool(false)
+        setDailyRepeat(false)
     }
 
     const resetStates = () => {
@@ -81,11 +78,12 @@ const NotificationScreen = () => {
                         title: object.title,
                         message: object.message,
                         date: object.date,
-                        repeat: "day",
+                        repeat: object.repeat,
                         id: object.id
                     }]
                 )
-                console.log("New data: ", jsonValue)
+
+                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             } else if (asyncStorageData == null) {
                 jsonValue = JSON.stringify(
@@ -93,11 +91,11 @@ const NotificationScreen = () => {
                         title: object.title,
                         message: object.message,
                         date: object.date,
-                        repeat: object.daily,
+                        repeat: object.repeat,
                         id: object.id
                     }]
                 )
-                console.log("New data: ", jsonValue)
+                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             }
 
@@ -116,7 +114,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data", jsonValue)
+            /* console.log("Getting Data", jsonValue) */
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -163,6 +161,7 @@ const NotificationScreen = () => {
                                 const array = [...asyncStorageData]
                                 const result = array.filter(item => item.id !== id)
                                 console.log("Array", result);
+                                PushNotification.cancelLocalNotification({ id: `${id}` })
                                 updateRemovedAsyncStorageArray(result)
                             }
                         }
@@ -208,6 +207,11 @@ const NotificationScreen = () => {
                         console.log("Swiped left!");
                         removeItemAsyncStorageArray(item.id)
                     }
+
+                    if (swipeLeft + event.nativeEvent.pageX > 50) {
+                        console.log("Left swipe");
+                    }
+
                 }}
             >
 
@@ -228,6 +232,7 @@ const NotificationScreen = () => {
                     </View>
                 ) : (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        {/*  <View style={{ backgroundColor: "lightgreen", height: 10, width: 10, borderRadius: 10 }} /> */}
                         <Text style={{}}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
@@ -422,7 +427,6 @@ const NotificationScreen = () => {
                                 color: dailyRepeat == false ? "black" : "white",
                                 fontWeight: dailyRepeat == false ? "400" : "600"
                             }}>Daily repeat</Text>
-                            {/* <View style={{ width: 5, height: "90%", backgroundColor: dailyRepeat == false ? "white" : "#037ffc", borderRadius: 50, position: "absolute", marginLeft: 5, }} /> */}
                         </TouchableOpacity>
                     </View>
 
