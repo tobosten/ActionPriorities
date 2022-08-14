@@ -1,4 +1,4 @@
-import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView } from 'react-native'
+import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView, Alert, Touchable } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import NotificationListEmpty from '../components/NotificationListEmpty'
 import FAB from '../components/FAB'
@@ -25,15 +25,15 @@ const NotificationScreen = () => {
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
+    const [swipeLeft, setSwipeLeft] = useState(0)
 
     useEffect(() => {
         getData()
     }, [listRefresh])
 
 
+    /* Sets notification */
     const scheduleNotification = (time) => {
-        /* Can set multiple alarms */
-
         let id = ""
         asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // will get duplicate id if deleting
 
@@ -56,6 +56,10 @@ const NotificationScreen = () => {
             Notifications.scheduleNotification(object)
         }
         storeData(object)
+        resetStates()
+    }
+
+    const resetStates = () => {
         setTitleInput("")
         setMessageInput("")
         setSelectedTime("Select time")
@@ -63,13 +67,13 @@ const NotificationScreen = () => {
         setDailyRepeat(false)
     }
 
-
     const storeData = async (object) => {
-        /* Needs refresh button for async list to update in notification screen atm. */
+        /* Stores data to AsyncStorage */
 
         let jsonValue = null
 
         try {
+            /* Check if asyncStorageData is empty */
             if (asyncStorageData !== null) {
                 jsonValue = JSON.stringify(
                     [...asyncStorageData,
@@ -108,10 +112,11 @@ const NotificationScreen = () => {
         setListRefresh(!listRefresh)
     }
 
+    /* Gets data from AsyncStorage */
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data: ", jsonValue)
+            console.log("Getting Data", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -134,25 +139,79 @@ const NotificationScreen = () => {
     }
 
 
+    /* Loops asyncStorageData to find correct notification */
+    const removeItemAsyncStorageArray = (id) => {
+        console.log(id);
+        asyncStorageData.forEach((item) => {
+            if (item.id == id) {
+                Alert.alert(
+                    "Remove notification?",
+                    "",
+                    [
+                        {
+                            text: "No",
+                            style: "cancel"
+                        },
+                        {
+                            text: "Yes",
+                            onPress: () => {
+                                /* setAsyncStorageData(current =>
+                                    current.filter(object => {
+                                        return (object.id !== item.id)
+                                    })
+                                ) */
+                                const array = [...asyncStorageData]
+                                const result = array.filter(item => item.id !== id)
+                                console.log("Array", result);
+                                updateRemovedAsyncStorageArray(result)
+                            }
+                        }
+                    ]
+                );
+            }
+        })
+    }
+
+    /* Removes selected notification */
+    const updateRemovedAsyncStorageArray = async (array) => {
+        let jsonValue = null
+
+        try {
+            jsonValue = JSON.stringify(array)
+            console.log("New data: ", jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue)
+
+            setListRefresh(!listRefresh)
+        } catch { }
+    }
+
+
     const renderItem = ({ item }) => {
-        let monthArray = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "Novermber", "December"]
-        let newDate = new Date(item.date)
 
-        let d = moment(item.date)
+        let newDate = moment(item.date)
 
-        let day = d.format("Do")
-        let month = d.format("MMM")
-        let hours = d.format("HH")
-        let min = d.format("MM")
+        let day = newDate.format("Do")
+        let month = newDate.format("MMM")
+        let hours = newDate.format("HH")
+        let min = newDate.format("MM")
 
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
 
         return (
-            <View style={[{ /* borderWidth: 1, */borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}>
+            <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
+                onTouchStart={event => setSwipeLeft(event.nativeEvent.pageX)}
+                onTouchEnd={event => {
 
-                <View style={{ /* borderWidth: 1,  */flex: 1, padding: 5, }}>
+                    if (swipeLeft - event.nativeEvent.pageX > 50) {
+                        /* Swipe left motion > 30px */
+                        console.log("Swiped left!");
+                        removeItemAsyncStorageArray(item.id)
+                    }
+                }}
+            >
+
+                <View style={{ flex: 1, padding: 5, }}>
                     <Text style={{ marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17 }}>{item.title}</Text>
                     <View style={[{ padding: 5, margin: 5, borderRadius: 5, borderTopWidth: 1, borderColor: "lightgray" }]}>
                         <Text>{item.message}</Text>
@@ -162,13 +221,13 @@ const NotificationScreen = () => {
                 <View style={{ width: 1, height: "70%", backgroundColor: "lightgray", alignSelf: "center" }} />
 
                 {item.repeat == "day" ? (
-                    <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                    <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
                         <Text style={{}}>Daily</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
                     </View>
                 ) : (
-                    <View style={{ /* borderWidth: 1, */ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                    <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
                         <Text style={{}}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
@@ -183,15 +242,12 @@ const NotificationScreen = () => {
     let windowHeight = Dimensions.get("window").height
     return (
         <SafeAreaView style={{ flex: 1, }}>
-            <View style={{ /* borderWidth: 1,  */flex: 1, }}>
-
-                <Button
+            <View style={{ flex: 1, }}>
+                {/* <Button
                     title="cancel notification"
                     onPress={() => {
                         Notifications.cancelAllNotifications()
                         AsyncStorage.clear()
-
-                        //PushNotification.cancelLocalNotification("2")
                         getData()
                     }}
                 />
@@ -199,16 +255,39 @@ const NotificationScreen = () => {
                 <Button
                     title="Async storage data"
                     onPress={() => {
-                        getData()
-
+                        console.log("asyncStorageData:", asyncStorageData);
                     }}
-                />
+                /> */}
 
                 <View style={{ flex: 0.1, }}>
 
                     <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
                         <Text style={{ marginLeft: 10, fontSize: 24 }}>Notifications</Text>
-                        <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10 }}
+                        <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10, }}
+                            onPress={() => {
+                                Alert.alert(
+                                    "Guide",
+                                    `- Swipe left: Remove notification \n- Swipe right: ... `,
+                                    [
+                                        {
+                                            text: "No",
+                                            style: "cancel"
+                                        },
+                                        {
+                                            text: "Yes",
+                                            onPress: () => {
+
+                                            }
+                                        }
+                                    ]
+                                );
+                            }}>
+                            <Image
+                                source={require("../assets/questionMarkImage.png")}
+                                style={{ height: 30, width: 30 }}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
                             onPress={() => { }}>
                             <Image
                                 source={require("../assets/refreshImage.png")}
@@ -361,11 +440,7 @@ const NotificationScreen = () => {
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 setModalOpen(!modalOpen)
-                                setTitleInput("")
-                                setMessageInput("")
-                                setSelectedTime("Select time")
-                                setTimeBool(false)
-                                setDailyRepeat(false)
+                                resetStates()
                             }}>
                             <Text style={{ fontSize: 18 }}>Cancel</Text>
                         </TouchableOpacity >
