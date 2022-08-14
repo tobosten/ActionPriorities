@@ -1,4 +1,4 @@
-import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView } from 'react-native'
+import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView, Alert } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import NotificationListEmpty from '../components/NotificationListEmpty'
 import FAB from '../components/FAB'
@@ -135,19 +135,33 @@ const NotificationScreen = () => {
     }
 
 
-    console.log("asyncStorageData:", asyncStorageData);
+    /* console.log("asyncStorageData:", asyncStorageData); */
 
     const removeItemAsyncStorageArray = (id) => {
         console.log(id);
         asyncStorageData.forEach((item) => {
             if (item.id == id) {
-                console.log(item);
-                setAsyncStorageData(current =>
-                    current.filter(object => {
-                        return (object.id !== item.id)
-                    })
-                )
-                updateRemovedAsyncStorageArray()
+                Alert.alert(
+                    "Remove notification?",
+                    "",
+                    [
+                        {
+                            text: "No",
+                            style: "cancel"
+                        },
+                        {
+                            text: "Yes",
+                            onPress: () => {
+                                setAsyncStorageData(current =>
+                                    current.filter(object => {
+                                        return (object.id !== item.id)
+                                    })
+                                )
+                                updateRemovedAsyncStorageArray()
+                            }
+                        }
+                    ]
+                );
             }
         })
     }
