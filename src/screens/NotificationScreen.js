@@ -25,6 +25,7 @@ const NotificationScreen = () => {
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
+    const [swipeLeft, setSwipeLeft] = useState(0)
 
     useEffect(() => {
         getData()
@@ -111,7 +112,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data: ", jsonValue)
+            console.log("Getting Data", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -134,10 +135,35 @@ const NotificationScreen = () => {
     }
 
 
+    console.log("asyncStorageData:", asyncStorageData);
+
+    const removeItemAsyncStorageArray = (id) => {
+        console.log(id);
+        asyncStorageData.forEach((item) => {
+            if (item.id == id) {
+                console.log(item);
+                setAsyncStorageData(current =>
+                    current.filter(object => {
+                        return (object.id !== item.id)
+                    })
+                )
+                updateRemovedAsyncStorageArray()
+            }
+        })
+    }
+
+    const updateRemovedAsyncStorageArray = async () => {
+        let jsonValue = null
+
+        try {
+            jsonValue = JSON.stringify([asyncStorageData])
+            console.log("New data: ", jsonValue)
+            await AsyncStorage.setItem("@storage_Key", jsonValue)
+        } catch { }
+    }
+
+
     const renderItem = ({ item }) => {
-        let monthArray = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "Novermber", "December"]
-        let newDate = new Date(item.date)
 
         let d = moment(item.date)
 
@@ -150,7 +176,20 @@ const NotificationScreen = () => {
         min.length < 2 ? min = `0${min}` : null;
 
         return (
-            <View style={[{ /* borderWidth: 1, */borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}>
+            <View style={[{ /* borderWidth: 1, */borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
+                onTouchStart={event => setSwipeLeft(event.nativeEvent.pageX)}
+                onTouchEnd={event => {
+
+                    if (swipeLeft - event.nativeEvent.pageX > 50) {
+                        /* Swipe left motion > 30px */
+                        console.log("Swiped left!");
+                        /* console.log(item.id); */
+                        /* PushNotification.cancelAllLocalNotifications() */
+                        /* PushNotification.cancelLocalNotification({ id: `${item.id}` }) */
+                        removeItemAsyncStorageArray(item.id)
+                    }
+                }}
+            >
 
                 <View style={{ /* borderWidth: 1,  */flex: 1, padding: 5, }}>
                     <Text style={{ marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17 }}>{item.title}</Text>
@@ -184,7 +223,6 @@ const NotificationScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ /* borderWidth: 1,  */flex: 1, }}>
-
                 <Button
                     title="cancel notification"
                     onPress={() => {
@@ -199,8 +237,8 @@ const NotificationScreen = () => {
                 <Button
                     title="Async storage data"
                     onPress={() => {
-                        getData()
-
+                        /* getData() */
+                        console.log("asyncStorageData:", asyncStorageData);
                     }}
                 />
 
