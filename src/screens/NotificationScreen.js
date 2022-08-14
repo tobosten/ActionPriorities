@@ -25,7 +25,7 @@ const NotificationScreen = () => {
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
-    const [swipeLeft, setSwipeLeft] = useState(0)
+    const [swipeMotion, setSwipeMotion] = useState(0)
 
 
     useEffect(() => {
@@ -43,10 +43,11 @@ const NotificationScreen = () => {
             message: messageInput,
             date: time,
             repeat: dailyRepeat == true ? "day" : "",
-            id: `${id}`
+            id: `${id}`,
+            active: true
         }
 
-        Notifications.scheduleNotificationRepeat(object)
+        Notifications.scheduleNotification(object)
 
         storeData(object)
         setTitleInput("")
@@ -79,7 +80,8 @@ const NotificationScreen = () => {
                         message: object.message,
                         date: object.date,
                         repeat: object.repeat,
-                        id: object.id
+                        id: object.id,
+                        active: true
                     }]
                 )
 
@@ -92,7 +94,8 @@ const NotificationScreen = () => {
                         message: object.message,
                         date: object.date,
                         repeat: object.repeat,
-                        id: object.id
+                        id: object.id,
+                        active: true
                     }]
                 )
                 /* console.log("New data: ", jsonValue) */
@@ -100,10 +103,6 @@ const NotificationScreen = () => {
             }
 
         } catch {
-            /* jsonValue = JSON.stringify([object])
-
-            console.log("Storing data: ", jsonValue)
-            await AsyncStorage.setItem("@storage_Key", jsonValue) */
             console.log("Failed to store data");
         }
 
@@ -136,10 +135,42 @@ const NotificationScreen = () => {
         setSelectedTime(`${hours} : ${min}`)
     }
 
+    /* Update active value */
+    const updateItemAsyncStorage = (id) => {
+        console.log(id)
+        let array = [...asyncStorageData]
+
+        array.forEach((item, index) => {
+            if (item.id === id) {
+                array[index].active == true ? array[index].active = false : array[index].active = true;
+                console.log(item);
+                console.log(array[index].active);
+                console.log("Array: ", array);
+
+                if (array[index].active == true) {
+                    PushNotification.scheduleLocalNotification({
+                        id: item.id,
+                        title: item.title,
+                        message: item.message,
+                        date: item.date,
+                        repeat: item.repeat
+                    })
+                } else {
+                    PushNotification.cancelLocalNotification({ id: `${item.id}` })
+                }
+
+                if (array[index].active == false) {
+
+                }
+
+                updateAsyncStorageArray(array)
+            }
+        })
+    }
+
 
     /* Loops asyncStorageData to find correct notification */
     const removeItemAsyncStorageArray = (id) => {
-        console.log(id);
         asyncStorageData.forEach((item) => {
             if (item.id == id) {
                 Alert.alert(
@@ -153,16 +184,13 @@ const NotificationScreen = () => {
                         {
                             text: "Yes",
                             onPress: () => {
-                                /* setAsyncStorageData(current =>
-                                    current.filter(object => {
-                                        return (object.id !== item.id)
-                                    })
-                                ) */
                                 const array = [...asyncStorageData]
                                 const result = array.filter(item => item.id !== id)
                                 console.log("Array", result);
                                 PushNotification.cancelLocalNotification({ id: `${id}` })
-                                updateRemovedAsyncStorageArray(result)
+                                updateAsyncStorageArray(result)
+
+                                console.log("Removed item id:", id);
                             }
                         }
                     ]
@@ -172,12 +200,12 @@ const NotificationScreen = () => {
     }
 
     /* Removes selected notification */
-    const updateRemovedAsyncStorageArray = async (array) => {
+    const updateAsyncStorageArray = async (array) => {
         let jsonValue = null
 
         try {
             jsonValue = JSON.stringify(array)
-            console.log("New data: ", jsonValue)
+            /* console.log("New data: ", jsonValue) */
             await AsyncStorage.setItem("@storage_Key", jsonValue)
 
             setListRefresh(!listRefresh)
@@ -194,22 +222,27 @@ const NotificationScreen = () => {
         let hours = newDate.format("HH")
         let min = newDate.format("MM")
 
+
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
 
+
+
         return (
             <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
-                onTouchStart={event => setSwipeLeft(event.nativeEvent.pageX)}
+                onTouchStart={event => setSwipeMotion(event.nativeEvent.pageX)}
                 onTouchEnd={event => {
 
-                    if (swipeLeft - event.nativeEvent.pageX > 50) {
-                        /* Swipe left motion > 30px */
+                    if (swipeMotion - event.nativeEvent.pageX > 50) {
+                        /* Swipe left motion > 50px */
                         console.log("Swiped left!");
+                        console.log(event.nativeEvent.pageX);
                         removeItemAsyncStorageArray(item.id)
                     }
 
-                    if (swipeLeft + event.nativeEvent.pageX > 50) {
-                        console.log("Left swipe");
+                    if (swipeMotion - event.nativeEvent.pageX < 50) {
+                        console.log("Right swipe");
+                        updateItemAsyncStorage(item.id)
                     }
 
                 }}
@@ -226,13 +259,22 @@ const NotificationScreen = () => {
 
                 {item.repeat == "day" ? (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        {item.active == true ? (
+                            <View style={{ height: 10, width: 10, backgroundColor: "lightgreen", borderRadius: 10 }}></View>
+                        ) : (
+                            <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
+                        )}
                         <Text style={{}}>Daily</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
                     </View>
                 ) : (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
-                        {/*  <View style={{ backgroundColor: "lightgreen", height: 10, width: 10, borderRadius: 10 }} /> */}
+                        {item.active == true ? (
+                            <View style={{ height: 10, width: 10, backgroundColor: "lightgreen", borderRadius: 10 }}></View>
+                        ) : (
+                            <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
+                        )}
                         <Text style={{}}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
@@ -272,7 +314,7 @@ const NotificationScreen = () => {
                             onPress={() => {
                                 Alert.alert(
                                     "Guide",
-                                    `- Swipe left: Remove notification \n- Swipe right: ... `,
+                                    `- Swipe left: Remove notification \n- Swipe right: Activate/Deactivate`,
                                     [
                                         {
                                             text: "No",
