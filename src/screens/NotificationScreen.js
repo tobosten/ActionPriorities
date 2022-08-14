@@ -25,7 +25,8 @@ const NotificationScreen = () => {
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
-    const [swipeLeft, setSwipeLeft] = useState(0)
+    const [swipeMotion, setSwipeMotion] = useState(0)
+
 
     useEffect(() => {
         getData()
@@ -37,26 +38,23 @@ const NotificationScreen = () => {
         let id = ""
         asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // will get duplicate id if deleting
 
-        console.log("Daily repeat", dailyRepeat)
         let object = {
             title: titleInput,
             message: messageInput,
             date: time,
-            id: `${id}`
+            repeat: dailyRepeat == true ? "day" : "",
+            id: `${id}`,
+            active: true
         }
-        if (dailyRepeat == true) {
-            Notifications.scheduleNotificationRepeat({
-                title: object.title,
-                message: object.message,
-                date: time,
-                repeat: "day",
-                id: object.id
-            })
-        } else {
-            Notifications.scheduleNotification(object)
-        }
+
+        Notifications.scheduleNotification(object)
+
         storeData(object)
-        resetStates()
+        setTitleInput("")
+        setMessageInput("")
+        setSelectedTime("Select time")
+        setTimeBool(false)
+        setDailyRepeat(false)
     }
 
     const resetStates = () => {
@@ -81,11 +79,13 @@ const NotificationScreen = () => {
                         title: object.title,
                         message: object.message,
                         date: object.date,
-                        repeat: "day",
-                        id: object.id
+                        repeat: object.repeat,
+                        id: object.id,
+                        active: true
                     }]
                 )
-                console.log("New data: ", jsonValue)
+
+                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             } else if (asyncStorageData == null) {
                 jsonValue = JSON.stringify(
@@ -93,19 +93,16 @@ const NotificationScreen = () => {
                         title: object.title,
                         message: object.message,
                         date: object.date,
-                        repeat: object.daily,
-                        id: object.id
+                        repeat: object.repeat,
+                        id: object.id,
+                        active: true
                     }]
                 )
-                console.log("New data: ", jsonValue)
+                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             }
 
         } catch {
-            /* jsonValue = JSON.stringify([object])
-
-            console.log("Storing data: ", jsonValue)
-            await AsyncStorage.setItem("@storage_Key", jsonValue) */
             console.log("Failed to store data");
         }
 
@@ -116,7 +113,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data", jsonValue)
+            /* console.log("Getting Data", jsonValue) */
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -138,10 +135,42 @@ const NotificationScreen = () => {
         setSelectedTime(`${hours} : ${min}`)
     }
 
+    /* Update active value */
+    const updateItemAsyncStorage = (id) => {
+        console.log(id)
+        let array = [...asyncStorageData]
+
+        array.forEach((item, index) => {
+            if (item.id === id) {
+                array[index].active == true ? array[index].active = false : array[index].active = true;
+                console.log(item);
+                console.log(array[index].active);
+                console.log("Array: ", array);
+
+                if (array[index].active == true) {
+                    PushNotification.scheduleLocalNotification({
+                        id: item.id,
+                        title: item.title,
+                        message: item.message,
+                        date: item.date,
+                        repeat: item.repeat
+                    })
+                } else {
+                    PushNotification.cancelLocalNotification({ id: `${item.id}` })
+                }
+
+                if (array[index].active == false) {
+
+                }
+
+                updateAsyncStorageArray(array)
+            }
+        })
+    }
+
 
     /* Loops asyncStorageData to find correct notification */
     const removeItemAsyncStorageArray = (id) => {
-        console.log(id);
         asyncStorageData.forEach((item) => {
             if (item.id == id) {
                 Alert.alert(
@@ -155,15 +184,13 @@ const NotificationScreen = () => {
                         {
                             text: "Yes",
                             onPress: () => {
-                                /* setAsyncStorageData(current =>
-                                    current.filter(object => {
-                                        return (object.id !== item.id)
-                                    })
-                                ) */
                                 const array = [...asyncStorageData]
                                 const result = array.filter(item => item.id !== id)
                                 console.log("Array", result);
-                                updateRemovedAsyncStorageArray(result)
+                                PushNotification.cancelLocalNotification({ id: `${id}` })
+                                updateAsyncStorageArray(result)
+
+                                console.log("Removed item id:", id);
                             }
                         }
                     ]
@@ -173,12 +200,12 @@ const NotificationScreen = () => {
     }
 
     /* Removes selected notification */
-    const updateRemovedAsyncStorageArray = async (array) => {
+    const updateAsyncStorageArray = async (array) => {
         let jsonValue = null
 
         try {
             jsonValue = JSON.stringify(array)
-            console.log("New data: ", jsonValue)
+            /* console.log("New data: ", jsonValue) */
             await AsyncStorage.setItem("@storage_Key", jsonValue)
 
             setListRefresh(!listRefresh)
@@ -195,19 +222,29 @@ const NotificationScreen = () => {
         let hours = newDate.format("HH")
         let min = newDate.format("MM")
 
+
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
 
+
+
         return (
             <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
-                onTouchStart={event => setSwipeLeft(event.nativeEvent.pageX)}
+                onTouchStart={event => setSwipeMotion(event.nativeEvent.pageX)}
                 onTouchEnd={event => {
 
-                    if (swipeLeft - event.nativeEvent.pageX > 50) {
-                        /* Swipe left motion > 30px */
+                    if (swipeMotion - event.nativeEvent.pageX > 50) {
+                        /* Swipe left motion > 50px */
                         console.log("Swiped left!");
+                        console.log(event.nativeEvent.pageX);
                         removeItemAsyncStorageArray(item.id)
                     }
+
+                    if (swipeMotion - event.nativeEvent.pageX < 50) {
+                        console.log("Right swipe");
+                        updateItemAsyncStorage(item.id)
+                    }
+
                 }}
             >
 
@@ -222,12 +259,22 @@ const NotificationScreen = () => {
 
                 {item.repeat == "day" ? (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        {item.active == true ? (
+                            <View style={{ height: 10, width: 10, backgroundColor: "lightgreen", borderRadius: 10 }}></View>
+                        ) : (
+                            <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
+                        )}
                         <Text style={{}}>Daily</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
                     </View>
                 ) : (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
+                        {item.active == true ? (
+                            <View style={{ height: 10, width: 10, backgroundColor: "lightgreen", borderRadius: 10 }}></View>
+                        ) : (
+                            <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
+                        )}
                         <Text style={{}}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
                         <Text>{`${hours}:${min}`}</Text>
@@ -243,21 +290,6 @@ const NotificationScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ flex: 1, }}>
-                {/* <Button
-                    title="cancel notification"
-                    onPress={() => {
-                        Notifications.cancelAllNotifications()
-                        AsyncStorage.clear()
-                        getData()
-                    }}
-                />
-
-                <Button
-                    title="Async storage data"
-                    onPress={() => {
-                        console.log("asyncStorageData:", asyncStorageData);
-                    }}
-                /> */}
 
                 <View style={{ flex: 0.1, }}>
 
@@ -267,7 +299,7 @@ const NotificationScreen = () => {
                             onPress={() => {
                                 Alert.alert(
                                     "Guide",
-                                    `- Swipe left: Remove notification \n- Swipe right: ... `,
+                                    `- Swipe left: Remove notification \n- Swipe right: Activate/Deactivate`,
                                     [
                                         {
                                             text: "No",
@@ -422,7 +454,6 @@ const NotificationScreen = () => {
                                 color: dailyRepeat == false ? "black" : "white",
                                 fontWeight: dailyRepeat == false ? "400" : "600"
                             }}>Daily repeat</Text>
-                            {/* <View style={{ width: 5, height: "90%", backgroundColor: dailyRepeat == false ? "white" : "#037ffc", borderRadius: 50, position: "absolute", marginLeft: 5, }} /> */}
                         </TouchableOpacity>
                     </View>
 
