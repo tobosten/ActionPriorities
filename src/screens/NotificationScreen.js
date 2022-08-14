@@ -290,21 +290,6 @@ const NotificationScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ flex: 1, }}>
-                {/* <Button
-                    title="cancel notification"
-                    onPress={() => {
-                        Notifications.cancelAllNotifications()
-                        AsyncStorage.clear()
-                        getData()
-                    }}
-                />
-
-                <Button
-                    title="Async storage data"
-                    onPress={() => {
-                        console.log("asyncStorageData:", asyncStorageData);
-                    }}
-                /> */}
 
                 <View style={{ flex: 0.1, }}>
 
