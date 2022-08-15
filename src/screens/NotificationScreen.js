@@ -33,7 +33,7 @@ const NotificationScreen = () => {
     }, [listRefresh])
 
 
-
+    /* Checks if date is in the past. */
     function isInThePast(date) {
         const today = new Date();
         return date < today;
@@ -72,9 +72,8 @@ const NotificationScreen = () => {
         setDailyRepeat(false)
     }
 
+    /* Stores data to AsyncStorage */
     const storeData = async (object) => {
-        /* Stores data to AsyncStorage */
-
         let jsonValue = null
 
         try {
@@ -91,8 +90,6 @@ const NotificationScreen = () => {
                         active: true
                     }]
                 )
-
-                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             } else if (asyncStorageData == null) {
                 jsonValue = JSON.stringify(
@@ -105,14 +102,12 @@ const NotificationScreen = () => {
                         active: true
                     }]
                 )
-                /* console.log("New data: ", jsonValue) */
                 await AsyncStorage.setItem("@storage_Key", jsonValue)
             }
 
         } catch {
             console.log("Failed to store data");
         }
-
         setListRefresh(!listRefresh)
     }
 
@@ -200,6 +195,7 @@ const NotificationScreen = () => {
         })
     }
 
+    /* Takes an id from an item and removes it. */
     const deleteItem = (id) => {
         const array = [...asyncStorageData]
         const result = array.filter(item => item.id !== id)
@@ -221,16 +217,14 @@ const NotificationScreen = () => {
         } catch { }
     }
 
-
+    /* Render item for reminders */
     const renderItem = ({ item }) => {
 
         let newDate = moment(item.date)
-
         let day = newDate.format("Do")
         let month = newDate.format("MMM")
         let hours = newDate.format("HH")
         let min = newDate.format("MM")
-
 
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
@@ -258,7 +252,6 @@ const NotificationScreen = () => {
 
                 }}
             >
-
                 <View style={{ flex: 1, padding: 5, }}>
                     <Text style={{ marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17 }}>{item.title}</Text>
                     <View style={[{ padding: 5, margin: 5, borderRadius: 5, borderTopWidth: 1, borderColor: "lightgray" }]}>
@@ -296,8 +289,6 @@ const NotificationScreen = () => {
         )
     }
 
-    let windowWidth = Dimensions.get("window").width
-    let windowHeight = Dimensions.get("window").height
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ flex: 1, }}>
@@ -348,10 +339,7 @@ const NotificationScreen = () => {
                     />
                 </View>
 
-
                 <View style={[{ flex: 0.2, backgroundColor: "white", justifyContent: "center", borderTopLeftRadius: 10, borderTopRightRadius: 10, borderTopWidth: 1, borderColor: "lightgray" }, borderShadow.depth24]}>
-
-
                     <TouchableOpacity style={[{
                         backgroundColor: "#037ffc",
                         width: "80%",
@@ -369,11 +357,8 @@ const NotificationScreen = () => {
                             fontSize: 18
                         }}>New Reminder</Text>
                     </TouchableOpacity>
-
-
                 </View>
             </View>
-
 
             <Modal
                 animationType='slide'
@@ -467,7 +452,6 @@ const NotificationScreen = () => {
                             }}>Daily repeat</Text>
                         </TouchableOpacity>
                     </View>
-
 
                     <View style={{ flexDirection: "row", marginTop: "15%", marginLeft: "auto", marginRight: "10%" }}>
                         <TouchableOpacity style={[{
