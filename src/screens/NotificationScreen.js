@@ -33,6 +33,13 @@ const NotificationScreen = () => {
     }, [listRefresh])
 
 
+
+    function isInThePast(date) {
+        const today = new Date();
+        return date < today;
+    }
+
+
     /* Sets notification */
     const scheduleNotification = (time) => {
         let id = ""
@@ -184,19 +191,22 @@ const NotificationScreen = () => {
                         {
                             text: "Yes",
                             onPress: () => {
-                                const array = [...asyncStorageData]
-                                const result = array.filter(item => item.id !== id)
-                                console.log("Array", result);
-                                PushNotification.cancelLocalNotification({ id: `${id}` })
-                                updateAsyncStorageArray(result)
-
-                                console.log("Removed item id:", id);
+                                deleteItem(id)
                             }
                         }
                     ]
                 );
             }
         })
+    }
+
+    const deleteItem = (id) => {
+        const array = [...asyncStorageData]
+        const result = array.filter(item => item.id !== id)
+        console.log("Array", result);
+        PushNotification.cancelLocalNotification({ id: `${id}` })
+        updateAsyncStorageArray(result)
+        console.log("Removed item id:", id);
     }
 
     /* Removes selected notification */
@@ -207,7 +217,6 @@ const NotificationScreen = () => {
             jsonValue = JSON.stringify(array)
             /* console.log("New data: ", jsonValue) */
             await AsyncStorage.setItem("@storage_Key", jsonValue)
-
             setListRefresh(!listRefresh)
         } catch { }
     }
@@ -226,7 +235,9 @@ const NotificationScreen = () => {
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
 
-
+        if (isInThePast(new Date(item.date)) == true) {
+            deleteItem(item.id)
+        }
 
         return (
             <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
