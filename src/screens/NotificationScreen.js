@@ -40,10 +40,24 @@ const NotificationScreen = () => {
     }
 
 
+
     /* Sets notification */
     const scheduleNotification = (time) => {
         let id = ""
-        asyncStorageData == null ? id = "0" : id = `${asyncStorageData.length}` // will get duplicate id if deleting
+        asyncStorageData == null ? id = `${0}` : id = `${asyncStorageData.length}` // will get duplicate id if deleting
+
+        if (asyncStorageData != null) {
+            asyncStorageData.forEach((item) => {
+                console.log(item.id);
+                if (item.id == id) {
+                    let pInt = parseInt(item.id)
+                    id = `${pInt + 1}`
+                    console.log("parsed ",id);
+                } else {
+                    id = `${asyncStorageData.length}`
+                }
+            })
+        }
 
         let object = {
             title: titleInput,
