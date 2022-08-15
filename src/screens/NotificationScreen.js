@@ -174,7 +174,7 @@ const NotificationScreen = () => {
         asyncStorageData.forEach((item) => {
             if (item.id == id) {
                 Alert.alert(
-                    "Remove notification?",
+                    "Remove reminder?",
                     "",
                     [
                         {
@@ -294,19 +294,19 @@ const NotificationScreen = () => {
                 <View style={{ flex: 0.1, }}>
 
                     <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
-                        <Text style={{ marginLeft: 10, fontSize: 24 }}>Notifications</Text>
+                        <Text style={{ marginLeft: 10, fontSize: 24 }}>Reminders</Text>
                         <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10, }}
                             onPress={() => {
                                 Alert.alert(
                                     "Guide",
-                                    `- Swipe left: Remove notification \n- Swipe right: Activate/Deactivate`,
+                                    `- Swipe left: Remove reminder \n- Swipe right: Activate/Deactivate`,
                                     [
                                         {
-                                            text: "No",
+                                            text: "",
                                             style: "cancel"
                                         },
                                         {
-                                            text: "Yes",
+                                            text: "Thanks",
                                             onPress: () => {
 
                                             }
@@ -356,7 +356,7 @@ const NotificationScreen = () => {
                             color: "white",
                             fontWeight: "500",
                             fontSize: 18
-                        }}>New Notification</Text>
+                        }}>New Reminder</Text>
                     </TouchableOpacity>
 
 
@@ -370,7 +370,7 @@ const NotificationScreen = () => {
             >
                 <View style={{ flex: 1, }}>
                     <View>
-                        <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>New notification</Text>
+                        <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>New Reminder</Text>
                     </View>
                     <View style={{ alignItems: "center" }}>
                         <InputComponent
