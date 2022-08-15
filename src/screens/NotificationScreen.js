@@ -333,16 +333,16 @@ const NotificationScreen = () => {
                             }}>
                             <Image
                                 source={require("../assets/questionMarkImage.png")}
-                                style={{ height: 30, width: 30 }}
+                                style={{ height: 30, width: 30, margin: 5 }}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
+                       {/*  <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
                             onPress={() => { }}>
                             <Image
                                 source={require("../assets/refreshImage.png")}
                                 style={{ height: 40, width: 40 }}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
 
