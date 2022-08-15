@@ -245,7 +245,10 @@ const NotificationScreen = () => {
         min.length < 2 ? min = `0${min}` : null;
 
         if (isInThePast(new Date(item.date)) == true) {
-            deleteItem(item.id)
+            if (item.repeat != "day") {
+                deleteItem(item.id)
+            }
+
         }
 
         return (
@@ -336,7 +339,7 @@ const NotificationScreen = () => {
                                 style={{ height: 30, width: 30, margin: 5 }}
                             />
                         </TouchableOpacity>
-                       {/*  <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
+                        {/*  <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
                             onPress={() => { }}>
                             <Image
                                 source={require("../assets/refreshImage.png")}

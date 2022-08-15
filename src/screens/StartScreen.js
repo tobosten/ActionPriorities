@@ -55,6 +55,8 @@ const StartScreen = ({ navigation }) => {
 
 
                     <Text style={{
+                        width: "100%",
+                        textAlign: "center",
                         fontSize: 34, fontWeight: "500",
                         color: "white",
                         textShadowColor: "black",
@@ -62,6 +64,8 @@ const StartScreen = ({ navigation }) => {
                         textShadowRadius: 5,
                     }}>Action</Text>
                     <Text style={{
+                        width: "100%",
+                        textAlign: "center",
                         fontSize: 34, fontWeight: "500",
                         color: "white",
                         textShadowColor: "black",
@@ -93,7 +97,7 @@ const StartScreen = ({ navigation }) => {
                     }}
                 >
                     <Text style={{ display: blink ? "none" : "flex", fontStyle: "italic", fontSize: 20, fontWeight: "500", color: "white", }}>To reminders</Text>
-                   
+
 
                 </TouchableOpacity>
             </View>
