@@ -130,7 +130,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            /* console.log("Getting Data", jsonValue) */
+            console.log("Getting Data", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -235,14 +235,17 @@ const NotificationScreen = () => {
     /* Render item for reminders */
     const renderItem = ({ item }) => {
 
+        /* console.log("Item date:", item.date, "Moment date:", moment(item.date)); */
+
         let newDate = moment(item.date)
         let day = newDate.format("Do")
         let month = newDate.format("MMM")
-        let hours = newDate.format("HH")
-        let min = newDate.format("MM")
+        let hours = newDate.format("h")
+        let min = newDate.format("mm")
 
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
+
 
         if (isInThePast(new Date(item.date)) == true) {
             if (item.repeat != "day") {
@@ -310,7 +313,10 @@ const NotificationScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ flex: 1, }}>
-
+                <Button
+                    title="Async data"
+                    onPress={() => { getData() }}
+                />
                 <View style={{ flex: 0.1, }}>
 
                     <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
@@ -433,6 +439,7 @@ const NotificationScreen = () => {
                             mode='datetime'
                             is24hourSource='locale'
                             onConfirm={(time) => {
+                                console.log("Confirm time: ", time);
                                 setDatePickerOpen(!datePickerOpen)
                                 formatTime(time)
                                 setDate(time)
