@@ -21,6 +21,16 @@ const borderShadow = StyleSheet.create({
         shadowOpacity: 0.27,
         shadowRadius: 4.65,
         elevation: 6,
+    }, 
+    depth6White: {
+        shadowColor: "#fff",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
     },
     depth12: {
         shadowColor: "#000",
