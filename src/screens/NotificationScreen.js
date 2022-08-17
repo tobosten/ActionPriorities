@@ -1,5 +1,5 @@
 import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView, Alert, Touchable } from 'react-native'
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useContext } from 'react'
 import NotificationListEmpty from '../components/NotificationListEmpty'
 import FAB from '../components/FAB'
 import NotificationComponent from '../components/NotificationComponent'
@@ -10,11 +10,14 @@ import InputComponent from '../components/InputComponent'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import PushNotification from 'react-native-push-notification'
 import moment from 'moment'
+import { ColorModeContext } from '../ProjectContext'
+
 
 const NotificationScreen = () => {
 
     const [date, setDate] = useState(new Date(Date.now()))
     const [datePickerOpen, setDatePickerOpen] = useState(false)
+    const { darkMode, setDarkMode } = useContext(ColorModeContext)
 
     const [asyncStorageData, setAsyncStorageData] = useState(null)
 
@@ -154,7 +157,7 @@ const NotificationScreen = () => {
 
     /* Update active value */
     const updateItemAsyncStorage = (id) => {
-        console.log(id)
+        /* console.log(id) */
         let array = [...asyncStorageData]
 
         array.forEach((item, index) => {
@@ -251,9 +254,8 @@ const NotificationScreen = () => {
             }
 
         }
-
         return (
-            <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: "white", marginVertical: 10 }, borderShadow.depth6]}
+            <View style={[{ borderRadius: 8, width: "95%", alignSelf: "center", flexDirection: "row", backgroundColor: darkMode == true ? "#2e2e2e" : "white", marginVertical: 10 }, borderShadow.depth6]}
                 onTouchStart={event => setSwipeMotion(event.nativeEvent.pageX)}
                 onTouchEnd={event => {
 
@@ -272,13 +274,16 @@ const NotificationScreen = () => {
                 }}
             >
                 <View style={{ flex: 1, padding: 5, }}>
-                    <Text style={{ marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17 }}>{item.title}</Text>
-                    <View style={[{ padding: 5, margin: 5, borderRadius: 5, borderTopWidth: 1, borderColor: "lightgray" }]}>
-                        <Text>{item.message}</Text>
+                    <Text style={{
+                        marginLeft: 5, marginTop: 5, marginBottom: 5, fontSize: 17,
+                        color: darkMode == true ? "#84789c" : "black"
+                    }}>{item.title}</Text>
+                    <View style={[{ padding: 5, margin: 5, borderRadius: 5, borderTopWidth: 1, borderColor: darkMode == true ? "#121212" : "gray" }]}>
+                        <Text style={{ color: darkMode == true ? "#84789c" : "black" }}>{item.message}</Text>
                     </View>
                 </View>
 
-                <View style={{ width: 1, height: "70%", backgroundColor: "lightgray", alignSelf: "center" }} />
+                <View style={{ width: 1, height: "70%", backgroundColor: darkMode == true ? "#121212" : "gray", alignSelf: "center" }} />
 
                 {item.repeat == "day" ? (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
@@ -287,9 +292,9 @@ const NotificationScreen = () => {
                         ) : (
                             <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
                         )}
-                        <Text style={{}}>Daily</Text>
+                        <Text style={{ color: darkMode == true ? "#84789c" : "black" }}>Daily</Text>
                         <View style={{ marginVertical: 3, }} />
-                        <Text>{`${hours}:${min}`}</Text>
+                        <Text style={{ color: darkMode == true ? "#84789c" : "black" }}>{`${hours}:${min}`}</Text>
                     </View>
                 ) : (
                     <View style={{ flex: .3, justifyContent: "center", alignItems: "center" }}>
@@ -298,9 +303,9 @@ const NotificationScreen = () => {
                         ) : (
                             <View style={{ height: 10, width: 10, backgroundColor: "gray", borderRadius: 10 }}></View>
                         )}
-                        <Text style={{}}>{`${month} ${day}`}</Text>
+                        <Text style={{ color: darkMode == true ? "#84789c" : "black" }}>{`${month} ${day}`}</Text>
                         <View style={{ marginVertical: 3, }} />
-                        <Text>{`${hours}:${min}`}</Text>
+                        <Text style={{ color: darkMode == true ? "#84789c" : "black" }}>{`${hours}:${min}`}</Text>
                     </View>
                 )
                 }
@@ -309,12 +314,14 @@ const NotificationScreen = () => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "#e8e8e8" }}>
             <View style={{ flex: 1, }}>
                 <View style={{ flex: 0.1, }}>
 
-                    <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
-                        <Text style={{ marginLeft: 10, fontSize: 24 }}>Reminders</Text>
+                    <View style={[{
+                        flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: darkMode == true ? "#121212" : "white", zIndex: 10
+                    }, darkMode == true ? borderShadow.depth6White : borderShadow.depth6]}>
+                        <Text style={{ marginLeft: 10, fontSize: 24, color: darkMode == true ? "#84789c" : "black" }}>Reminders</Text>
                         <TouchableOpacity style={{ marginLeft: "auto", marginRight: 20, marginVertical: 10, }}
                             onPress={() => {
                                 Alert.alert(
@@ -335,7 +342,7 @@ const NotificationScreen = () => {
                                 );
                             }}>
                             <Image
-                                source={require("../assets/questionMarkImage.png")}
+                                source={darkMode == true ? require("../assets/darkMode/qMark.png") : require("../assets/questionMarkImage.png")}
                                 style={{ height: 30, width: 30, margin: 5 }}
                             />
                         </TouchableOpacity>
@@ -356,10 +363,18 @@ const NotificationScreen = () => {
                         keyExtractor={(item, index) => index}
                     />
                 </View>
-
-                <View style={[{ flex: 0.2, backgroundColor: "white", justifyContent: "center", borderTopLeftRadius: 10, borderTopRightRadius: 10, borderTopWidth: 1, borderColor: "lightgray" }, borderShadow.depth24]}>
+                {/* #037ff */}
+                <View style={[{
+                    flex: 0.2,
+                    backgroundColor: darkMode == true ? "#121212" : "white",
+                    justifyContent: "center",
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                    borderTopWidth: 1,
+                    borderColor: darkMode == true ? "black" : "lightgray"
+                }, borderShadow.depth24]}>
                     <TouchableOpacity style={[{
-                        backgroundColor: "#037ffc",
+                        backgroundColor: darkMode == true ? "#84789c" : "#0e8fe6",
                         width: "80%",
                         alignSelf: "center",
                         paddingVertical: 15,
@@ -372,7 +387,7 @@ const NotificationScreen = () => {
                             textAlign: "center",
                             color: "white",
                             fontWeight: "500",
-                            fontSize: 18
+                            fontSize: 18,
                         }}>New Reminder</Text>
                     </TouchableOpacity>
                 </View>
@@ -382,9 +397,12 @@ const NotificationScreen = () => {
                 animationType='slide'
                 visible={modalOpen}
             >
-                <View style={{ flex: 1, }}>
+                <View style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "white" }}>
                     <View>
-                        <Text style={{ fontSize: 22, marginTop: 20, marginLeft: 20 }}>New Reminder</Text>
+                        <Text style={{
+                            fontSize: 22, marginTop: 20, marginLeft: 20,
+                            color: darkMode == true ? "#84789c" : "black"
+                        }}>New Reminder</Text>
                     </View>
                     <View style={{ alignItems: "center" }}>
                         <InputComponent
@@ -406,7 +424,7 @@ const NotificationScreen = () => {
 
                     <View style={{ alignItems: "center" }}>
                         <TouchableOpacity style={[{
-                            backgroundColor: timeBool == false ? "white" : "#037ffc",
+                            backgroundColor: darkMode == true ? (timeBool == false ? "#2e2e2e" : "#84789c") : (timeBool == false ? "white" : "#037ffc"),
                             padding: 5,
                             borderRadius: 8,
                             marginTop: 20,
@@ -417,11 +435,10 @@ const NotificationScreen = () => {
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 setDatePickerOpen(!datePickerOpen)
-                                /* setDate(new Date()) */
                             }}>
                             <Text style={{
                                 fontSize: 18,
-                                color: timeBool == false ? "black" : "white",
+                                color: timeBool == false ? "#84789c" : "white",
                                 fontWeight: timeBool == false ? "400" : "600"
                             }}>{selectedTime}</Text>
                         </TouchableOpacity>
@@ -447,7 +464,7 @@ const NotificationScreen = () => {
                     <View style={{}}>
                         <TouchableOpacity style={[{
                             padding: 5,
-                            backgroundColor: dailyRepeat == false ? "white" : "#037ffc",
+                            backgroundColor: darkMode == true ? (dailyRepeat == false ? "#2e2e2e" : "#84789c") : (dailyRepeat == false ? "white" : "#037ffc"),
                             borderRadius: 8,
                             marginTop: 20,
                             width: 170,
@@ -465,7 +482,7 @@ const NotificationScreen = () => {
                                 fontSize: 18,
                                 textAlign: "center",
                                 width: "100%",
-                                color: dailyRepeat == false ? "black" : "white",
+                                color: dailyRepeat == false ? "#84789c" : "white",
                                 fontWeight: dailyRepeat == false ? "400" : "600"
                             }}>Daily repeat</Text>
                         </TouchableOpacity>
@@ -480,13 +497,13 @@ const NotificationScreen = () => {
                             marginHorizontal: 5,
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: "white"
+                            backgroundColor: darkMode == true ? "#84789c" : "white"
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 setModalOpen(!modalOpen)
                                 resetStates()
                             }}>
-                            <Text style={{ fontSize: 18 }}>Cancel</Text>
+                            <Text style={{ fontSize: 18, color: darkMode == true ? "white" : "black", fontWeight: darkMode == true ? "500" : "400" }}>Cancel</Text>
                         </TouchableOpacity >
                         <TouchableOpacity style={[{
                             paddingVertical: 10,
@@ -494,7 +511,7 @@ const NotificationScreen = () => {
                             borderRadius: 5,
                             height: 50,
                             marginHorizontal: 5,
-                            backgroundColor: "white",
+                            backgroundColor: darkMode == true ? "#84789c" : "white",
                             justifyContent: "center",
                             alignItems: "center",
                         }, borderShadow.depth6]}
@@ -503,7 +520,7 @@ const NotificationScreen = () => {
                                 scheduleNotification(date)
 
                             }}>
-                            <Text style={{ fontSize: 18 }}>Confirm</Text>
+                            <Text style={{ fontSize: 18, color: darkMode == true ? "white" : "black", fontWeight: darkMode == true ? "500" : "400" }}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

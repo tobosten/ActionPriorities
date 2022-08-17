@@ -1,11 +1,12 @@
-import { View, Text, TouchableOpacity, ImageBackground, Animated, Easing, Image } from 'react-native'
-import React, { useState, useRef, useEffect } from 'react'
+import { View, Text, TouchableOpacity, ImageBackground, Animated, Easing, Image, LogBox } from 'react-native'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import borderShadow from '../assets/borderShadow'
+import { ColorModeContext } from '../ProjectContext'
 
 const StartScreen = ({ navigation }) => {
 
     const [blink, setBlink] = useState(false)
-
+    const { darkMode, setDarkMode } = useContext(ColorModeContext)
 
     /*  useEffect(() => {
          const interval = setInterval(() => {
@@ -17,6 +18,16 @@ const StartScreen = ({ navigation }) => {
              clearInterval(interval)
          }
      }, []) */
+
+    /* 
+       #0f173b
+       #3700B3
+       The recommended dark theme surface color is #121212
+       Purple: #451280
+       Lightpurple: #84789c
+       Lightblue: #0e8fe6
+       Gray: #2e2e2e
+    */
 
 
     const rotateAnimation = useRef(new Animated.Value(0)).current;
@@ -39,7 +50,7 @@ const StartScreen = ({ navigation }) => {
 
 
     return (
-        <View style={{ flex: 1, }}>
+        <View style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "" }}>
             <View style={{ alignItems: "center", flex: 1, justifyContent: "center", paddingBottom: 20 }}
 
             >
@@ -50,7 +61,7 @@ const StartScreen = ({ navigation }) => {
                     height: 200,
                     width: 200,
                     borderRadius: 100,
-                    backgroundColor: "#0e8fe6"
+                    backgroundColor: darkMode == true ? "#84789c" : "#0e8fe6"
                 }, borderShadow.depth12]}>
 
 
@@ -74,7 +85,7 @@ const StartScreen = ({ navigation }) => {
                     }}>Reminder</Text>
 
                     <Animated.View
-                        style={{ borderLeftWidth: 2, borderColor: "gray", height: 210, width: 210, position: "absolute", borderRadius: 500, transform: [{ rotate: spin }] }}
+                        style={{ borderLeftWidth: 2, borderColor: "#2e2e2e", height: 210, width: 210, position: "absolute", borderRadius: 500, transform: [{ rotate: spin }] }}
                     />
                 </View>
             </View>
@@ -85,7 +96,7 @@ const StartScreen = ({ navigation }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     /* borderWidth: 1, */
-                    backgroundColor: "#0e8fe6",
+                    backgroundColor: darkMode == true ? "#84789c" : "#0e8fe6",
                     width: "70%",
                     alignSelf: "center",
                     paddingVertical: 10,
