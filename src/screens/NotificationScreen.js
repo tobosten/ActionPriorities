@@ -74,17 +74,14 @@ const NotificationScreen = () => {
         Notifications.scheduleNotification(object)
 
         storeData(object)
-        setTitleInput("")
-        setMessageInput("")
-        setSelectedTime("Select time")
-        setTimeBool(false)
-        setDailyRepeat(false)
+        resetStates()
     }
 
     const resetStates = () => {
         setTitleInput("")
         setMessageInput("")
         setSelectedTime("Select time")
+        setSelectedTimeFull("Select time")
         setTimeBool(false)
         setDailyRepeat(false)
     }
