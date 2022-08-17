@@ -1,23 +1,12 @@
-import { View, Text, TouchableOpacity, ImageBackground, Animated, Easing, Image, LogBox } from 'react-native'
+import { View, Text, TouchableOpacity, ImageBackground, Animated, Easing, Image, Button, Switch } from 'react-native'
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import borderShadow from '../assets/borderShadow'
 import { ColorModeContext } from '../ProjectContext'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const StartScreen = ({ navigation }) => {
 
-    const [blink, setBlink] = useState(false)
     const { darkMode, setDarkMode } = useContext(ColorModeContext)
-
-    /*  useEffect(() => {
-         const interval = setInterval(() => {
- 
-             setBlink((blink) => setBlink(!blink))
-         }, 700)
- 
-         return () => {
-             clearInterval(interval)
-         }
-     }, []) */
 
     /* 
        #0f173b
@@ -28,6 +17,30 @@ const StartScreen = ({ navigation }) => {
        Lightblue: #0e8fe6
        Gray: #2e2e2e
     */
+
+    useEffect(() => {
+        getDarkMode()
+    }, [])
+
+
+    const storeDarkMode = async (value) => {
+        let jsonValue = null
+        try {
+            jsonValue = JSON.stringify(value)
+            await AsyncStorage.setItem("@darkMode", jsonValue)
+        } catch {
+            console.log("Failed to store darkMode bool in AsyncStorage.");
+        }
+    }
+
+    const getDarkMode = async () => {
+        try {
+            let jsonValue = await AsyncStorage.getItem('@darkMode')
+            setDarkMode(JSON.parse(jsonValue))
+        } catch (e) {
+            console.log("Failed to get darkMode data from AsyncStorage.");
+        }
+    }
 
 
     const rotateAnimation = useRef(new Animated.Value(0)).current;
@@ -50,12 +63,26 @@ const StartScreen = ({ navigation }) => {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "" }}>
-            <View style={{ alignItems: "center", flex: 1, justifyContent: "center", paddingBottom: 20 }}
+        <View style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "#e8e8e8" }}>
+
+            <View style={{ marginLeft: "auto", marginRight: 10, marginTop: 20, alignItems: "center" }}>
+                <Text style={{ color: darkMode == true ? "#84789c" : "#0e8fe6" }}>{darkMode == true ? "Dark theme" : "Light theme"}</Text>
+                <Switch
+                    trackColor={{ false: "white", true: "#84789c", }}
+                    thumbColor={darkMode ? "white" : "#0e8fe6"}
+                    onValueChange={(value) => {
+                        setDarkMode(value)
+                        storeDarkMode(value)
+                    }}
+                    value={darkMode}
+                />
+            </View>
+
+
+            <View style={{ alignItems: "center", flex: 1, justifyContent: "center", paddingBottom: 20, marginTop: -20 }}
 
             >
                 <View style={[{
-                    /* borderWidth: 1, */
                     alignItems: "center",
                     justifyContent: "center",
                     height: 200,
@@ -107,7 +134,7 @@ const StartScreen = ({ navigation }) => {
                         navigation.navigate("NotificationScreen")
                     }}
                 >
-                    <Text style={{ display: blink ? "none" : "flex", fontStyle: "italic", fontSize: 20, fontWeight: "500", color: "white", }}>To reminders</Text>
+                    <Text style={{ fontStyle: "italic", fontSize: 20, fontWeight: "500", color: "white", }}>To reminders</Text>
 
 
                 </TouchableOpacity>

@@ -15,6 +15,7 @@ const NotificationScreen = () => {
     const [date, setDate] = useState(new Date(Date.now()))
     const [datePickerOpen, setDatePickerOpen] = useState(false)
     const { darkMode, setDarkMode } = useContext(ColorModeContext)
+    const [asyncDarkMode, setAsyncDarkMode] = useState(true)
 
     const [asyncStorageData, setAsyncStorageData] = useState(null)
 
@@ -131,10 +132,13 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data", jsonValue)
+            /* console.log("Getting Data", jsonValue) */
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
+
+
+
 
 
     function formatTime(time) {
@@ -314,10 +318,15 @@ const NotificationScreen = () => {
         )
     }
 
+
+
+
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "#e8e8e8" }}>
             <View style={{ flex: 1, }}>
                 <View style={{ flex: 0.1, }}>
+
 
                     <View style={[{
                         flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: darkMode == true ? "#121212" : "white", zIndex: 10
