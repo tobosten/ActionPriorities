@@ -23,6 +23,7 @@ const StartScreen = ({ navigation }) => {
     }, [])
 
 
+    /* Stores bool value to AsyncStorage with key: @darkMode */
     const storeDarkMode = async (value) => {
         let jsonValue = null
         try {
@@ -33,6 +34,7 @@ const StartScreen = ({ navigation }) => {
         }
     }
 
+    /* Gets dark mode bool from storage with key: @darkMode and sets context to it. */
     const getDarkMode = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@darkMode')
@@ -43,6 +45,7 @@ const StartScreen = ({ navigation }) => {
     }
 
 
+    /* Rotation animatino */
     const rotateAnimation = useRef(new Animated.Value(0)).current;
     Animated.loop(
         Animated.timing(
@@ -54,8 +57,6 @@ const StartScreen = ({ navigation }) => {
         }
         )
     ).start()
-
-
     const spin = rotateAnimation.interpolate({
         inputRange: [0, 1],
         outputRange: ["0deg", "360deg"]
