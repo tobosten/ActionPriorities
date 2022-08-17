@@ -38,7 +38,10 @@ const StartScreen = ({ navigation }) => {
     const getDarkMode = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@darkMode')
-            setDarkMode(JSON.parse(jsonValue))
+            if (jsonValue != null) {
+                setDarkMode(JSON.parse(jsonValue))
+            }
+
         } catch (e) {
             console.log("Failed to get darkMode data from AsyncStorage.");
         }
@@ -65,7 +68,6 @@ const StartScreen = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1, backgroundColor: darkMode == true ? "#121212" : "#e8e8e8" }}>
-
             <View style={{ marginLeft: "auto", marginRight: 10, marginTop: 20, alignItems: "center" }}>
                 <Text style={{ color: darkMode == true ? "#84789c" : "#0e8fe6" }}>{darkMode == true ? "Dark theme" : "Light theme"}</Text>
                 <Switch
