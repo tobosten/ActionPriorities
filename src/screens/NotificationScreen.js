@@ -49,11 +49,11 @@ const NotificationScreen = () => {
         /* Makes sure id is not duplicate */
         if (asyncStorageData != null) {
             asyncStorageData.forEach((item) => {
-                console.log(item.id);
+                /* console.log(item.id); */
                 if (item.id == id) {
                     let pInt = parseInt(item.id)
                     id = `${pInt + 1}`
-                    console.log("parsed ", id);
+                    /* console.log("parsed ", id); */
                 } else {
                     id = `${asyncStorageData.length}`
                 }
@@ -130,7 +130,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            console.log("Getting Data", jsonValue)
+            /* console.log("Getting Data", jsonValue) */
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -160,9 +160,9 @@ const NotificationScreen = () => {
         array.forEach((item, index) => {
             if (item.id === id) {
                 array[index].active == true ? array[index].active = false : array[index].active = true;
-                console.log(item);
+                /* console.log(item);
                 console.log(array[index].active);
-                console.log("Array: ", array);
+                console.log("Array: ", array); */
 
                 if (array[index].active == true) {
                     PushNotification.scheduleLocalNotification({
@@ -235,8 +235,6 @@ const NotificationScreen = () => {
     /* Render item for reminders */
     const renderItem = ({ item }) => {
 
-        /* console.log("Item date:", item.date, "Moment date:", moment(item.date)); */
-
         let newDate = moment(item.date)
         let day = newDate.format("Do")
         let month = newDate.format("MMM")
@@ -261,13 +259,13 @@ const NotificationScreen = () => {
 
                     if (swipeMotion - event.nativeEvent.pageX > 50) {
                         /* Swipe left motion > 50px */
-                        console.log("Swiped left!");
-                        console.log(event.nativeEvent.pageX);
+                        /* console.log("Swiped left!");
+                        console.log(event.nativeEvent.pageX); */
                         removeItemAsyncStorageArray(item.id)
                     }
 
                     if (swipeMotion - event.nativeEvent.pageX < 50) {
-                        console.log("Right swipe");
+                        /* console.log("Right swipe"); */
                         updateItemAsyncStorage(item.id)
                     }
 
@@ -313,10 +311,6 @@ const NotificationScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, }}>
             <View style={{ flex: 1, }}>
-                <Button
-                    title="Async data"
-                    onPress={() => { getData() }}
-                />
                 <View style={{ flex: 0.1, }}>
 
                     <View style={[{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "white", zIndex: 10 }, borderShadow.depth6]}>
@@ -439,7 +433,6 @@ const NotificationScreen = () => {
                             mode='datetime'
                             is24hourSource='locale'
                             onConfirm={(time) => {
-                                console.log("Confirm time: ", time);
                                 setDatePickerOpen(!datePickerOpen)
                                 formatTime(time)
                                 setDate(time)
