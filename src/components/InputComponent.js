@@ -20,9 +20,11 @@ const InputComponent = ({ value, valueChange, title, viewStyle, inputStyle }) =>
                     value={value}
                     onChangeText={valueChange}
                     multiline={true}
-                    style={[{ borderWidth: 1, borderColor: darkMode == true ? "#84789c" : "black", marginVertical: 10, paddingHorizontal: 10, width: "100%", fontSize: 16, borderRadius: 3, textAlignVertical: "top", 
-                    color: "#84789c"
-                }, inputStyle]}
+                    keyboardAppearance={darkMode == true ? 'dark' : "default"}
+                    style={[{
+                        borderWidth: 1, borderColor: darkMode == true ? "#84789c" : "black", marginVertical: 10, paddingHorizontal: 10, width: "100%", fontSize: 16, borderRadius: 3, textAlignVertical: "top",
+                        color: "#84789c"
+                    }, inputStyle]}
 
                 />
             </View>

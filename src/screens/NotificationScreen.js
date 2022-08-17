@@ -25,6 +25,7 @@ const NotificationScreen = () => {
     const [titleInput, setTitleInput] = useState("")
     const [messageInput, setMessageInput] = useState("")
     const [selectedTime, setSelectedTime] = useState("Select time")
+    const [selectedTimeFull, setSelectedTimeFull] = useState("Select time")
     const [timeBool, setTimeBool] = useState(false)
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
@@ -144,6 +145,8 @@ const NotificationScreen = () => {
         let date = time
         let hours = date.getHours().toString()
         let min = date.getMinutes().toString()
+        let month = moment(time).format("MMM")
+        let day = moment(time).format("Do")
 
         if (hours.length < 2) {
             hours = "0" + `${hours}`
@@ -153,6 +156,7 @@ const NotificationScreen = () => {
         }
 
         setSelectedTime(`${hours} : ${min}`)
+        setSelectedTimeFull(`${month} ${day} at ${hours} : ${min}`)
     }
 
     /* Update active value */
@@ -438,9 +442,9 @@ const NotificationScreen = () => {
                             }}>
                             <Text style={{
                                 fontSize: 18,
-                                color: timeBool == false ? "#84789c" : "white",
+                                color: darkMode == true ? (timeBool == false ? "#84789c" : "white") : (timeBool == false ? "black" : "white"),
                                 fontWeight: timeBool == false ? "400" : "600"
-                            }}>{selectedTime}</Text>
+                            }}>{dailyRepeat == true ? selectedTime : selectedTimeFull}</Text>
                         </TouchableOpacity>
 
                         <DatePicker
@@ -482,7 +486,7 @@ const NotificationScreen = () => {
                                 fontSize: 18,
                                 textAlign: "center",
                                 width: "100%",
-                                color: dailyRepeat == false ? "#84789c" : "white",
+                                color: darkMode == true ? dailyRepeat == false ? "#84789c" : "white" : dailyRepeat == false ? "black" : "white",
                                 fontWeight: dailyRepeat == false ? "400" : "600"
                             }}>Daily repeat</Text>
                         </TouchableOpacity>
