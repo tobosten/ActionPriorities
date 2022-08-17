@@ -1,8 +1,5 @@
 import { View, Text, Image, Dimensions, FlatList, Switch, Button, TouchableOpacity, Modal, TextInput, Animated, SafeAreaView, Alert, Touchable } from 'react-native'
 import React, { useEffect, useState, useRef, useContext } from 'react'
-import NotificationListEmpty from '../components/NotificationListEmpty'
-import FAB from '../components/FAB'
-import NotificationComponent from '../components/NotificationComponent'
 import DatePicker from 'react-native-date-picker'
 import Notifications from '../Notifications'
 import borderShadow from '../assets/borderShadow'
@@ -134,7 +131,7 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            /* console.log("Getting Data", jsonValue) */
+            console.log("Getting Data", jsonValue)
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -365,7 +362,20 @@ const NotificationScreen = () => {
                         data={asyncStorageData}
                         renderItem={renderItem}
                         keyExtractor={(item, index) => index}
+                        ListEmptyComponent={() => {
+                            return (
+                                <View style={{ borderColor: "white", paddingTop: "30%", alignItems: "center" }}>
+                                    <Text style={{ color: darkMode == true ? "#84789c" : "gray", fontSize: 18 }}>You have no reminders yet</Text>
+                                    <Image
+                                        source={require("../assets/poro-shocked.png")}
+                                        style={{ height: 60, width: 60, margin: 10 }}
+                                    />
+                                </View>
+
+                            )
+                        }}
                     />
+
                 </View>
                 {/* #037ff */}
                 <View style={[{
