@@ -349,7 +349,7 @@ const NotificationScreen = () => {
                                 );
                             }}>
                             <Image
-                                source={darkMode == true ? require("../assets/darkMode/qMark.png") : require("../assets/questionMarkImage.png")}
+                                source={darkMode == true ? require("../assets/darkMode/qMarkWhite.png") : require("../assets/qMarkBlack.png")}
                                 style={{ height: 30, width: 30, margin: 5 }}
                             />
                         </TouchableOpacity>
