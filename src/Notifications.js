@@ -43,7 +43,8 @@ class Notifications {
             title: title,
             message: message,
             date: date,
-            repeatType: repeat //repeats  month | week | day | hour | minute
+            repeatType: repeat, //repeats  month | week | day | hour | minute
+            allowWhileIdle: true,
         })
 
     }
