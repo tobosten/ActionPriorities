@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ActionPriorities",
-    "slug": "ActionPriorities",
+    "name": "Action Reminder",
+    "slug": "Action Reminder",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
     ]
   },
-  "name": "ActionPriorities"
+  "name": "Action Reminder"
 }
