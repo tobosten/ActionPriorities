@@ -76,6 +76,7 @@ const StartScreen = ({ navigation }) => {
                     onValueChange={(value) => {
                         setDarkMode(value)
                         storeDarkMode(value)
+                        rotateAnimation.setValue(0)
                     }}
                     value={darkMode}
                 />
