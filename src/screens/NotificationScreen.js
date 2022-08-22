@@ -28,6 +28,7 @@ const NotificationScreen = () => {
     const [dailyRepeat, setDailyRepeat] = useState(false)
     const [listRefresh, setListRefresh] = useState(false)
     const [swipeMotion, setSwipeMotion] = useState(0)
+    const [confirmButton, setConfirmButton] = useState(false)
 
 
     useEffect(() => {
@@ -538,9 +539,10 @@ const NotificationScreen = () => {
                             backgroundColor: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e",
                         }, borderShadow.depth6]}
                             onPress={() => {
-                                setModalOpen(!modalOpen)
-                                scheduleNotification(date)
-
+                                if (titleInput && messageInput !== "" && selectedTime !== "Select time") {
+                                    setModalOpen(!modalOpen)
+                                    scheduleNotification(date)
+                                }
                             }}>
                             <Text style={{
                                 fontSize: 18,
