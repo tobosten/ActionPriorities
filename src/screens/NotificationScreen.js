@@ -142,10 +142,11 @@ const NotificationScreen = () => {
     function formatTime(time) {
         /* formats 1:8 to 01:08 */
         let date = time
-        let hours = date.getHours().toString()
-        let min = date.getMinutes().toString()
+        let hours = moment(date).format("h")
+        let min = moment(date).format("mm")
         let month = moment(time).format("MMM")
         let day = moment(time).format("Do")
+        let dayTime = moment(time).format("a").toUpperCase()
 
         if (hours.length < 2) {
             hours = "0" + `${hours}`
@@ -155,7 +156,7 @@ const NotificationScreen = () => {
         }
 
         setSelectedTime(`${hours} : ${min}`)
-        setSelectedTimeFull(`${month} ${day} at ${hours} : ${min}`)
+        setSelectedTimeFull(`${month} ${day} at ${hours} : ${min} ${dayTime}`)
     }
 
     /* Update active value */
