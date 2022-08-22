@@ -178,6 +178,7 @@ const NotificationScreen = () => {
                         repeat: item.repeat
                     })
                 } else {
+                    /* Cancel notif with the item id */
                     PushNotification.cancelLocalNotification({ id: `${item.id}` })
                 }
 
@@ -534,13 +535,18 @@ const NotificationScreen = () => {
                             backgroundColor: darkMode == true ? "#84789c" : "white",
                             justifyContent: "center",
                             alignItems: "center",
+                            backgroundColor: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e",
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 setModalOpen(!modalOpen)
                                 scheduleNotification(date)
 
                             }}>
-                            <Text style={{ fontSize: 18, color: darkMode == true ? "white" : "black", fontWeight: darkMode == true ? "500" : "400" }}>Confirm</Text>
+                            <Text style={{
+                                fontSize: 18,
+                                color: darkMode == true ? "white" : "black",
+                                fontWeight: darkMode == true ? "500" : "400"
+                            }}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
