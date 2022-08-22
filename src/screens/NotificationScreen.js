@@ -470,7 +470,7 @@ const NotificationScreen = () => {
                             open={datePickerOpen}
                             modal
                             mode='datetime'
-                            is24hourSource='locale'
+                            is24hourSource='device'
                             onConfirm={(time) => {
                                 setDatePickerOpen(!datePickerOpen)
                                 formatTime(time)
