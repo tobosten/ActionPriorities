@@ -472,6 +472,7 @@ const NotificationScreen = () => {
                             modal
                             mode='datetime'
                             is24hourSource='device'
+                            textColor='#000000'
                             onConfirm={(time) => {
                                 setDatePickerOpen(!datePickerOpen)
                                 formatTime(time)
