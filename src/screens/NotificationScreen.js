@@ -246,7 +246,7 @@ const NotificationScreen = () => {
         let day = newDate.format("Do")
         let month = newDate.format("MMM")
         let hours = newDate.format("h")
-        let min = newDate.format("mm")
+        let min = newDate.format("mm a").toUpperCase()
 
         hours.length < 2 ? hours = `0${hours}` : null;
         min.length < 2 ? min = `0${min}` : null;
@@ -538,7 +538,7 @@ const NotificationScreen = () => {
                             alignItems: "center",
                             backgroundColor: darkMode == true ?
                                 (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e")
-                                : 
+                                :
                                 (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#0e8fe6" : "gray"),
                         }, borderShadow.depth6]}
                             onPress={() => {
