@@ -536,7 +536,10 @@ const NotificationScreen = () => {
                             backgroundColor: darkMode == true ? "#84789c" : "white",
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e",
+                            backgroundColor: darkMode == true ?
+                                (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e")
+                                : 
+                                (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#0e8fe6" : "gray"),
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 if (titleInput && messageInput !== "" && selectedTime !== "Select time") {
@@ -546,8 +549,11 @@ const NotificationScreen = () => {
                             }}>
                             <Text style={{
                                 fontSize: 18,
-                                color: darkMode == true ? "white" : "black",
-                                fontWeight: darkMode == true ? "500" : "400"
+                                color: darkMode == true ?
+                                    ("white")
+                                    :
+                                    (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "white" : "white"),
+                                fontWeight: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "500" : "400"
                             }}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
