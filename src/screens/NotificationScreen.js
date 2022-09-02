@@ -8,9 +8,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import PushNotification from 'react-native-push-notification'
 import moment from 'moment'
 import { ColorModeContext } from '../ProjectContext'
+import { useToast } from 'react-native-toast-notifications'
 
 
 const NotificationScreen = () => {
+
+    const toast = useToast();
 
     const [date, setDate] = useState(new Date(Date.now()))
     const [datePickerOpen, setDatePickerOpen] = useState(false)
@@ -30,6 +33,7 @@ const NotificationScreen = () => {
     const [swipeMotion, setSwipeMotion] = useState(0)
     const [confirmButton, setConfirmButton] = useState(false)
 
+    const [existingTitle, setExistingTitle] = useState(false)
 
     useEffect(() => {
         getData()
@@ -85,6 +89,7 @@ const NotificationScreen = () => {
         setSelectedTimeFull("Select time")
         setTimeBool(false)
         setDailyRepeat(false)
+        setExistingTitle(false)
     }
 
     /* Stores data to AsyncStorage */
@@ -319,7 +324,26 @@ const NotificationScreen = () => {
     }
 
 
+    /* Checks if title exists or not */
+    function checkExistingTitle() {
+        let exist = ""
+        asyncStorageData.forEach((item) => {
+            if (item.title == titleInput) {
+                setExistingTitle(true)
+                exist = true
+            } else {
+                setExistingTitle(false)
+                exist = false
+            }
+        })
 
+        if (exist === false) {
+            if (titleInput && messageInput !== "" && selectedTime !== "Select time") {
+                setModalOpen(!modalOpen)
+                scheduleNotification(date)
+            }
+        }
+    }
 
 
     return (
@@ -428,13 +452,29 @@ const NotificationScreen = () => {
                         }}>New Reminder</Text>
                     </View>
                     <View style={{ alignItems: "center" }}>
+
                         <InputComponent
                             title={"Title"}
                             value={titleInput}
                             valueChange={setTitleInput}
                             viewStyle={{ marginTop: 50 }}
-                            inputStyle={{ paddingVertical: 5, paddingTop: 15 }}
+                            inputStyle={{ paddingVertical: 5 }}
                         />
+                        {existingTitle == true ? (
+                            <Text style={{
+                                marginRight: "auto",
+                                marginLeft: "10%",
+                                color: "red",
+                                marginTop: -5,
+                                fontSize: 12,
+                            }}>Title already exists</Text>
+                        ) : (
+                            <Text style={{
+                                marginRight: "auto",
+                                marginLeft: "10%",
+                            }}></Text>
+                        )}
+
 
                         <InputComponent
                             title={"Message"}
@@ -478,6 +518,7 @@ const NotificationScreen = () => {
                                 formatTime(time)
                                 setDate(time)
                                 timeBool == false ? setTimeBool(true) : null
+
                             }}
                             onCancel={() => {
                                 setDatePickerOpen(!datePickerOpen)
@@ -544,11 +585,9 @@ const NotificationScreen = () => {
                                 (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#0e8fe6" : "gray"),
                         }, borderShadow.depth6]}
                             onPress={() => {
-                                if (titleInput && messageInput !== "" && selectedTime !== "Select time") {
-                                    setModalOpen(!modalOpen)
-                                    scheduleNotification(date)
-                                }
-                            }}>
+                                checkExistingTitle()
+                            }
+                            }>
                             <Text style={{
                                 fontSize: 18,
                                 color: darkMode == true ?
