@@ -337,7 +337,7 @@ const NotificationScreen = () => {
             }
         })
 
-        if (exist === false) {
+        if (exist == false) {
             if (titleInput && messageInput !== "" && selectedTime !== "Select time") {
                 setModalOpen(!modalOpen)
                 scheduleNotification(date)
@@ -565,8 +565,8 @@ const NotificationScreen = () => {
                             backgroundColor: darkMode == true ? "#84789c" : "white"
                         }, borderShadow.depth6]}
                             onPress={() => {
-                                setModalOpen(!modalOpen)
-                                resetStates()
+                                 setModalOpen(!modalOpen)
+                                 resetStates()
                             }}>
                             <Text style={{ fontSize: 18, color: darkMode == true ? "white" : "black", fontWeight: darkMode == true ? "500" : "400" }}>Cancel</Text>
                         </TouchableOpacity >
@@ -586,6 +586,8 @@ const NotificationScreen = () => {
                         }, borderShadow.depth6]}
                             onPress={() => {
                                 checkExistingTitle()
+                                /* setModalOpen(!modalOpen)
+                                scheduleNotification(date) */
                             }
                             }>
                             <Text style={{
