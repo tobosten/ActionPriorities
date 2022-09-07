@@ -41,24 +41,17 @@ const NotificationScreen = () => {
     useEffect(() => {
         getData()
         if (Dimensions.get("screen").height < 620) {
-            console.log("Hej");
             setDeviceTilt("landscape")
         }
     }, [listRefresh])
 
 
 
-    console.log(Dimensions.get("screen").height);
     /* Checks if date is in the past. */
     function isInThePast(date) {
         const today = new Date();
         return date < today;
     }
-
-
-
-
-
 
     /* Sets notification */
     const scheduleNotification = (time) => {
@@ -68,11 +61,9 @@ const NotificationScreen = () => {
         /* Makes sure id is not duplicate */
         if (asyncStorageData != null) {
             asyncStorageData.forEach((item) => {
-                /* console.log(item.id); */
                 if (item.id == id) {
                     let pInt = parseInt(item.id)
                     id = `${pInt + 1}`
-                    /* console.log("parsed ", id); */
                 } else {
                     id = `${asyncStorageData.length}`
                 }
@@ -147,7 +138,6 @@ const NotificationScreen = () => {
     const getData = async () => {
         try {
             let jsonValue = await AsyncStorage.getItem('@storage_Key')
-            /* console.log("Getting Data", jsonValue) */
             setAsyncStorageData(JSON.parse(jsonValue))
         } catch (e) { }
     }
@@ -178,16 +168,11 @@ const NotificationScreen = () => {
 
     /* Update active value */
     const updateItemAsyncStorage = (id) => {
-        /* console.log(id) */
         let array = [...asyncStorageData]
 
         array.forEach((item, index) => {
             if (item.id === id) {
                 array[index].active == true ? array[index].active = false : array[index].active = true;
-                /* console.log(item);
-                console.log(array[index].active);
-                console.log("Array: ", array); */
-
                 if (array[index].active == true) {
                     PushNotification.scheduleLocalNotification({
                         id: item.id,
@@ -239,10 +224,8 @@ const NotificationScreen = () => {
     const deleteItem = (id) => {
         const array = [...asyncStorageData]
         const result = array.filter(item => item.id !== id)
-        console.log("Array", result);
         PushNotification.cancelLocalNotification({ id: `${id}` })
         updateAsyncStorageArray(result)
-        console.log("Removed item id:", id);
     }
 
     /* Removes selected notification */
@@ -251,7 +234,6 @@ const NotificationScreen = () => {
 
         try {
             jsonValue = JSON.stringify(array)
-            /* console.log("New data: ", jsonValue) */
             await AsyncStorage.setItem("@storage_Key", jsonValue)
             setListRefresh(!listRefresh)
         } catch { }
@@ -283,13 +265,11 @@ const NotificationScreen = () => {
 
                     if (swipeMotion - event.nativeEvent.pageX > 50) {
                         /* Swipe left motion > 50px */
-                        /* console.log("Swiped left!");
-                        console.log(event.nativeEvent.pageX); */
                         removeItemAsyncStorageArray(item.id)
                     }
 
                     if (swipeMotion - event.nativeEvent.pageX < 50) {
-                        /* console.log("Right swipe"); */
+                        /* Able to press */
                         updateItemAsyncStorage(item.id)
                     }
 
@@ -392,13 +372,6 @@ const NotificationScreen = () => {
                                 style={{ height: 30, width: 30, margin: 5 }}
                             />
                         </TouchableOpacity>
-                        {/*  <TouchableOpacity style={{ marginLeft: 10, marginRight: 20, marginVertical: 10 }}
-                            onPress={() => { }}>
-                            <Image
-                                source={require("../assets/refreshImage.png")}
-                                style={{ height: 40, width: 40 }}
-                            />
-                        </TouchableOpacity> */}
                     </View>
                 </View>
 
