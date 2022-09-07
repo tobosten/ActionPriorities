@@ -11,6 +11,8 @@ import { ColorModeContext } from '../ProjectContext'
 import { useToast } from 'react-native-toast-notifications'
 
 
+
+
 const NotificationScreen = () => {
 
     const toast = useToast();
@@ -32,19 +34,29 @@ const NotificationScreen = () => {
     const [listRefresh, setListRefresh] = useState(false)
     const [swipeMotion, setSwipeMotion] = useState(0)
     const [confirmButton, setConfirmButton] = useState(false)
+    const [deviceTilt, setDeviceTilt] = useState("")
 
     const [existingTitle, setExistingTitle] = useState(false)
 
     useEffect(() => {
         getData()
+        if (Dimensions.get("screen").height < 620) {
+            console.log("Hej");
+            setDeviceTilt("landscape")
+        }
     }, [listRefresh])
 
 
+
+    console.log(Dimensions.get("screen").height);
     /* Checks if date is in the past. */
     function isInThePast(date) {
         const today = new Date();
         return date < today;
     }
+
+
+
 
 
 
@@ -526,79 +538,88 @@ const NotificationScreen = () => {
                         />
                     </View>
 
-                    <View style={{}}>
-                        <TouchableOpacity style={[{
-                            padding: 5,
-                            backgroundColor: darkMode == true ? (dailyRepeat == false ? "#2e2e2e" : "#84789c") : (dailyRepeat == false ? "white" : "#037ffc"),
-                            borderRadius: 8,
-                            marginTop: 20,
-                            width: 170,
-                            height: 50,
-                            alignItems: "center",
-                            marginLeft: "auto",
-                            marginRight: "10%",
-                            flexDirection: "row"
-                        }, borderShadow.depth6]}
-                            onPress={() => {
-                                setDailyRepeat(!dailyRepeat)
-                            }}
-                        >
-                            <Text style={{
-                                fontSize: 18,
-                                textAlign: "center",
-                                width: "100%",
-                                color: darkMode == true ? dailyRepeat == false ? "#84789c" : "white" : dailyRepeat == false ? "black" : "white",
-                                fontWeight: dailyRepeat == false ? "400" : "600"
-                            }}>Daily repeat</Text>
-                        </TouchableOpacity>
-                    </View>
 
-                    <View style={{ flexDirection: "row", marginTop: "15%", marginLeft: "auto", marginRight: "10%" }}>
-                        <TouchableOpacity style={[{
-                            paddingVertical: 10,
-                            paddingHorizontal: 15,
-                            borderRadius: 5,
-                            height: 50,
-                            marginHorizontal: 5,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            backgroundColor: darkMode == true ? "#84789c" : "white"
-                        }, borderShadow.depth6]}
-                            onPress={() => {
-                                 setModalOpen(!modalOpen)
-                                 resetStates()
-                            }}>
-                            <Text style={{ fontSize: 18, color: darkMode == true ? "white" : "black", fontWeight: darkMode == true ? "500" : "400" }}>Cancel</Text>
-                        </TouchableOpacity >
-                        <TouchableOpacity style={[{
-                            paddingVertical: 10,
-                            paddingHorizontal: 15,
-                            borderRadius: 5,
-                            height: 50,
-                            marginHorizontal: 5,
-                            backgroundColor: darkMode == true ? "#84789c" : "white",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            backgroundColor: darkMode == true ?
-                                (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e")
-                                :
-                                (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#0e8fe6" : "gray"),
-                        }, borderShadow.depth6]}
-                            onPress={() => {
-                                checkExistingTitle()
-                                /* setModalOpen(!modalOpen)
-                                scheduleNotification(date) */
-                            }
-                            }>
-                            <Text style={{
-                                fontSize: 18,
-                                color: darkMode == true ?
-                                    ("white")
+                    {/* View that checks landscape mode or not */}
+                    <View style={{ flexDirection: deviceTilt == "landscape" ? 'row' : "column", marginLeft: "auto", marginRight: "10%", marginTop: 20 }}>
+
+                        <View style={{
+                            /* borderWidth: 1,
+                            borderColor: "white", */
+
+                        }}>
+                            <TouchableOpacity style={[{
+
+                                padding: 5,
+                                paddingHorizontal: 10,
+                                backgroundColor: darkMode == true ? (dailyRepeat == false ? "#2e2e2e" : "#84789c") : (dailyRepeat == false ? "white" : "#037ffc"),
+                                borderRadius: 8,
+                                height: 50,
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }, borderShadow.depth6]}
+                                onPress={() => {
+                                    setDailyRepeat(!dailyRepeat)
+                                }}>
+                                <Text style={{
+                                    fontSize: 18,
+                                    color: darkMode == true ? dailyRepeat == false ? "#84789c" : "white" : dailyRepeat == false ? "black" : "white",
+                                    fontWeight: dailyRepeat == false ? "400" : "600"
+                                }}>Daily Repeat</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={{
+                            flexDirection: "row",
+                            marginLeft: 30,
+                            marginTop: deviceTilt !== "landscape" ? 20 : 0,
+                        }}>
+                            <TouchableOpacity style={{
+                                paddingVertical: 10,
+                                paddingHorizontal: 15,
+                                borderRadius: 5,
+                                height: 50,
+                                width: 80,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: darkMode == true ? "#84789c" : "white"
+                            }}
+                                onPress={() => {
+                                    setModalOpen(!modalOpen)
+                                    resetStates()
+                                }}>
+                                <Text style={{
+                                    fontSize: 18, color: darkMode == true ? "white" : "black",
+                                    fontWeight: darkMode == true ? "500" : "400"
+                                }}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{
+                                paddingVertical: 10,
+                                paddingHorizontal: 15,
+                                borderRadius: 5,
+                                height: 50,
+                                marginLeft: 10,
+                                backgroundColor: darkMode == true ? "#84789c" : "white",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: darkMode == true ?
+                                    (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#84789c" : "#2e2e2e")
                                     :
-                                    (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "white" : "white"),
-                                fontWeight: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "500" : "400"
-                            }}>Confirm</Text>
-                        </TouchableOpacity>
+                                    (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "#0e8fe6" : "gray"),
+                            }}
+                                onPress={() => {
+                                    checkExistingTitle()
+                                }}
+                            >
+                                <Text style={{
+                                    fontSize: 18,
+                                    color: darkMode == true ?
+                                        ("white")
+                                        :
+                                        (titleInput && messageInput !== "" && selectedTime !== "Select time" ? "white" : "white"),
+                                    fontWeight: titleInput && messageInput !== "" && selectedTime !== "Select time" ? "500" : "400"
+                                }}>Confirm</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
